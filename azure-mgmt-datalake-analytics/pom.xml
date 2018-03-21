@@ -7,13 +7,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.microsoft.azure</groupId>
-    <artifactId>azure-parent</artifactId>
-    <version>1.7.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <artifactId>azure-lite-parent</artifactId>
+    <version>1.7.0</version>
+    <relativePath>../pom-lite.xml</relativePath>
   </parent>
 
   <artifactId>azure-mgmt-datalake-analytics</artifactId>
-  <version>1.7.1-beta-SNAPSHOT</version>
+  <version>1.0.0-beta1.5</version>
   <packaging>jar</packaging>
 
   <name>Microsoft Azure SDK for Data Lake Analytics Management</name>
@@ -54,18 +54,16 @@
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-resources</artifactId>
-      <version>1.7.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-datalake-store</artifactId>
-      <version>1.7.1-beta-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-storage</artifactId>
-      <version>1.7.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -78,13 +76,13 @@
       <artifactId>azure-client-authentication</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.microsoft.azure</groupId>
-      <artifactId>azure-mgmt-resources</artifactId>
-      <version>1.7.1-SNAPSHOT</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.microsoft.azure</groupId>-->
+      <!--<artifactId>azure-mgmt-resources</artifactId>-->
+      <!--<version>1.7.1-SNAPSHOT</version>-->
+      <!--<type>test-jar</type>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>

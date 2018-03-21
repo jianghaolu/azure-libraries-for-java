@@ -9,12 +9,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.microsoft.azure</groupId>
-        <artifactId>azure-parent</artifactId>
-        <version>1.7.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <artifactId>azure-lite-parent</artifactId>
+        <version>1.7.0</version>
+        <relativePath>../pom-lite.xml</relativePath>
     </parent>
     <artifactId>azure-mgmt-apimanagement</artifactId>
     <packaging>jar</packaging>
+    <version>1.7.0-beta</version>
     <name>Microsoft Azure SDK for ApiManagement Management</name>
     <description>This package contains Microsoft ApiManagement Management SDK.</description>
     <url>https://github.com/Azure/azure-sdk-for-java</url>
@@ -46,14 +47,13 @@
             <artifactId>azure-client-runtime</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.azure</groupId>
-            <artifactId>azure-mgmt-resources</artifactId>
-            <version>1.7.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>azure-mgmt-resources</artifactId>
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
