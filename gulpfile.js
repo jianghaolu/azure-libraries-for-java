@@ -125,7 +125,7 @@ var codegen = function(project, cb) {
                         ' --java ' +
                         ' --azure-arm ' +
                         generator +
-                        ` --namespace=${mappings[project].package} ` +
+                        ` --java.namespace=${mappings[project].package} ` +
                         ` --java.output-folder=${outDir} ` +
                         ` --license-header=MICROSOFT_MIT_NO_CODEGEN ` +
                         generatorPath +

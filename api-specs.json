@@ -17,6 +17,12 @@
     "package": "com.microsoft.azure.management.appservice",
     "args": "--payload-flattening-threshold=1 --tag=package-2016-09"
   },
+  "authorization": {
+    "dir": "azure-mgmt-graph-rbac",
+    "source": "specification/authorization/resource-manager/readme.md",
+    "package": "com.microsoft.azure.management.graphrbac",
+    "args": "--payload-flattening-threshold=1 --tag=package-2015-07"
+  },
   "arm-keyvault": {
     "dir": "azure-mgmt-keyvault",
     "source": "specification/keyvault/resource-manager/readme.md",
