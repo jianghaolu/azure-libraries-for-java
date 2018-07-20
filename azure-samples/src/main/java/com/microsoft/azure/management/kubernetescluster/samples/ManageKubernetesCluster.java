@@ -38,7 +38,7 @@ public class ManageKubernetesCluster {
     public static boolean runSample(Azure azure, String clientId, String secret) {
         final String rgName = SdkContext.randomResourceName("rgaks", 15);
         final String aksName = SdkContext.randomResourceName("akssample", 30);
-        final Region region = Region.UK_WEST;
+        final Region region = Region.US_EAST;
         String servicePrincipalClientId = clientId; // replace with a real service principal client id
         String servicePrincipalSecret = secret; // and corresponding secret
         final String rootUserName = "aksuser";
@@ -51,15 +51,19 @@ public class ManageKubernetesCluster {
             //
             //     If the environment variable was not set then reuse the main service principal set for running this sample.
 
-            if (servicePrincipalClientId.isEmpty() || servicePrincipalSecret.isEmpty()) {
-                String envSecondaryServicePrincipal = System.getenv("AZURE_AUTH_LOCATION_2");
+            if (servicePrincipalClientId == null || servicePrincipalClientId.isEmpty() || servicePrincipalSecret == null || servicePrincipalSecret.isEmpty()) {
+                servicePrincipalClientId = System.getenv("AZURE_CLIENT_ID");
+                servicePrincipalSecret = System.getenv("AZURE_CLIENT_SECRET");
+                if (servicePrincipalClientId == null || servicePrincipalClientId.isEmpty() || servicePrincipalSecret == null || servicePrincipalSecret.isEmpty()) {
+                    String envSecondaryServicePrincipal = System.getenv("AZURE_AUTH_LOCATION_2");
 
-                if (envSecondaryServicePrincipal == null || !envSecondaryServicePrincipal.isEmpty() || !Files.exists(Paths.get(envSecondaryServicePrincipal))) {
-                    envSecondaryServicePrincipal = System.getenv("AZURE_AUTH_LOCATION");
+                    if (envSecondaryServicePrincipal == null || !envSecondaryServicePrincipal.isEmpty() || !Files.exists(Paths.get(envSecondaryServicePrincipal))) {
+                        envSecondaryServicePrincipal = System.getenv("AZURE_AUTH_LOCATION");
+                    }
+
+                    servicePrincipalClientId = Utils.getSecondaryServicePrincipalClientID(envSecondaryServicePrincipal);
+                    servicePrincipalSecret = Utils.getSecondaryServicePrincipalSecret(envSecondaryServicePrincipal);
                 }
-
-                servicePrincipalClientId = Utils.getSecondaryServicePrincipalClientID(envSecondaryServicePrincipal);
-                servicePrincipalSecret = Utils.getSecondaryServicePrincipalSecret(envSecondaryServicePrincipal);
             }
 
 

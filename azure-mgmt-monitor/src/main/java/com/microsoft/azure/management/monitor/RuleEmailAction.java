@@ -21,14 +21,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("Microsoft.Azure.Management.Insights.Models.RuleEmailAction")
 public class RuleEmailAction extends RuleAction {
     /**
-     * Whether the administrators (service and co-adiminstrators) of the
+     * Whether the administrators (service and co-administrators) of the
      * service should be notified when the alert is activated.
      */
     @JsonProperty(value = "sendToServiceOwners")
     private Boolean sendToServiceOwners;
 
     /**
-     * the list of administrator's custom email addresses notifiy of the
+     * the list of administrator's custom email addresses to notify of the
      * activation of the alert.
      */
     @JsonProperty(value = "customEmails")

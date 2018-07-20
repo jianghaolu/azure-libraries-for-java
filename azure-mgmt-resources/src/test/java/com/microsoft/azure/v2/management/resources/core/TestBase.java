@@ -16,10 +16,18 @@ import com.microsoft.azure.serializer.AzureJacksonAdapter;
 import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.RestClient;
 import com.microsoft.rest.interceptors.LoggingInterceptor;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.rules.TestName;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +47,8 @@ public abstract class TestBase {
 
     public enum TestMode {
         PLAYBACK,
-        RECORD
+        RECORD,
+        NONE
     }
 
     protected final static String ZERO_SUBSCRIPTION = "00000000-0000-0000-0000-000000000000";
@@ -78,6 +87,8 @@ public abstract class TestBase {
                 testMode = TestMode.RECORD;
             } else if (azureTestMode.equalsIgnoreCase("Playback")) {
                 testMode = TestMode.PLAYBACK;
+            } else if (azureTestMode.equalsIgnoreCase("None")) {
+                testMode = TestMode.NONE;
             } else {
                 throw new IOException("Unknown AZURE_TEST_MODE: " + azureTestMode);
             }
@@ -154,12 +165,14 @@ public abstract class TestBase {
                     .withResponseBuilderFactory(new AzureResponseBuilder.Factory())
                     .withCredentials(credentials)
                     .withLogLevel(LogLevel.NONE)
+                    .withNetworkInterceptor(new ResourceGroupTaggingInterceptor())
                     .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
                     .withNetworkInterceptor(interceptorManager.initInterceptor())
                     .withInterceptor(new ResourceManagerThrottlingInterceptor())
                     ,true);
 
             defaultSubscription = ZERO_SUBSCRIPTION;
+            interceptorManager.addTextReplacementRule(PLAYBACK_URI_BASE + "1234", playbackUri);
             System.out.println(playbackUri);
             out = System.out;
             System.setOut(new PrintStream(new OutputStream() {
@@ -168,22 +181,36 @@ public abstract class TestBase {
                 }
             }));
         }
-        else { // Record mode
-            final File credFile = new File(System.getenv("AZURE_AUTH_LOCATION"));
-            credentials = ApplicationTokenCredentials.fromFile(credFile);
-            restClient = buildRestClient(new RestClient.Builder()
-                    .withBaseUrl(this.baseUri())
-                    .withSerializerAdapter(new AzureJacksonAdapter())
-                    .withResponseBuilderFactory(new AzureResponseBuilder.Factory())
-                    .withInterceptor(new ProviderRegistrationInterceptor(credentials))
-                    .withCredentials(credentials)
-                    .withLogLevel(LogLevel.NONE)
-                    .withReadTimeout(3, TimeUnit.MINUTES)
-                    .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS))
-                    .withNetworkInterceptor(interceptorManager.initInterceptor())
-                    .withInterceptor(new ResourceManagerThrottlingInterceptor())
-                    ,false);
+        else {
+            if (System.getenv("AZURE_AUTH_LOCATION") != null) { // Record mode
+                final File credFile = new File(System.getenv("AZURE_AUTH_LOCATION"));
+                credentials = ApplicationTokenCredentials.fromFile(credFile);
+            } else {
+                String clientId = System.getenv("AZURE_CLIENT_ID");
+                String tenantId = System.getenv("AZURE_TENANT_ID");
+                String clientSecret = System.getenv("AZURE_CLIENT_SECRET");
+                String subscriptionId = System.getenv("AZURE_SUBSCRIPTION_ID");
+                if (clientId == null || tenantId == null || clientSecret == null || subscriptionId == null) {
+                    throw new IllegalArgumentException("When running tests in record mode either 'AZURE_AUTH_LOCATION' or 'AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_CLIENT_SECRET and AZURE_SUBSCRIPTION_ID' needs to be set");
+                }
 
+                credentials = new ApplicationTokenCredentials(clientId, tenantId, clientSecret, AzureEnvironment.AZURE);
+                credentials.withDefaultSubscriptionId(subscriptionId);
+            }
+            RestClient.Builder builder = new RestClient.Builder()
+                            .withBaseUrl(this.baseUri())
+                            .withSerializerAdapter(new AzureJacksonAdapter())
+                            .withResponseBuilderFactory(new AzureResponseBuilder.Factory())
+                            .withInterceptor(new ProviderRegistrationInterceptor(credentials))
+                            .withNetworkInterceptor(new ResourceGroupTaggingInterceptor())
+                            .withCredentials(credentials)
+                            .withLogLevel(LogLevel.NONE)
+                            .withReadTimeout(3, TimeUnit.MINUTES)
+                            .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS));
+            if (!interceptorManager.isNoneMode()) {
+                builder.withNetworkInterceptor(interceptorManager.initInterceptor());
+            }
+            restClient = buildRestClient(builder.withInterceptor(new ResourceManagerThrottlingInterceptor()),false);
             defaultSubscription = credentials.defaultSubscriptionId();
             interceptorManager.addTextReplacementRule(defaultSubscription, ZERO_SUBSCRIPTION);
             interceptorManager.addTextReplacementRule(credentials.domain(), ZERO_TENANT);

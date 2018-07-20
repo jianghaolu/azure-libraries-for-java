@@ -11,9 +11,11 @@ import com.microsoft.azure.management.containerinstance.implementation.Container
 import com.microsoft.azure.management.containerinstance.implementation.ContainerInstanceManager;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.GroupableResource;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
+import com.microsoft.azure.management.resources.fluentcore.model.Appliable;
 import com.microsoft.azure.management.resources.fluentcore.model.Attachable;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
+import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import rx.Observable;
 
 import java.util.Collection;
@@ -27,7 +29,8 @@ import java.util.Set;
 @Beta(Beta.SinceVersion.V1_3_0)
 public interface ContainerGroup extends
     GroupableResource<ContainerInstanceManager, ContainerGroupInner>,
-    Refreshable<ContainerGroup> {
+    Refreshable<ContainerGroup>,
+    Updatable<ContainerGroup.Update> {
 
     /***********************************************************
      * Getters
@@ -70,6 +73,18 @@ public interface ContainerGroup extends
      */
     @Beta(Beta.SinceVersion.V1_5_0)
     ContainerGroupRestartPolicy restartPolicy();
+
+    /**
+     * @return the DNS prefix which was specified at creation time
+     */
+    @Beta(Beta.SinceVersion.V1_7_0)
+    String dnsPrefix();
+
+    /**
+     * @return the FQDN for the container group
+     */
+    @Beta(Beta.SinceVersion.V1_7_0)
+    String fqdn();
 
     /**
      * @return the IP address
@@ -145,9 +160,35 @@ public interface ContainerGroup extends
      */
     Observable<String> getLogContentAsync(String containerName, int tailLineCount);
 
+    /**
+     * Starts the exec command for a specific container instance.
+     *
+     * @param containerName the container instance name
+     * @param command the command to be executed
+     * @param row the row size of the terminal
+     * @param column the column size of the terminal
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the log lines from the end, up to the number specified
+     */
+    @Beta(Beta.SinceVersion.V1_11_0)
+    ContainerExecResponse executeCommand(String containerName, String command, int row, int column);
 
     /**
-     * The entirety of the Azure Container Instance service container group definition.
+     * Starts the exec command for a specific container instance within the container group.
+     *
+     * @param containerName the container instance name
+     * @param command the command to be executed
+     * @param row the row size of the terminal
+     * @param column the column size of the terminal
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return a representation of the future computation of this call
+     */
+    @Beta(Beta.SinceVersion.V1_11_0)
+    Observable<ContainerExecResponse> executeCommandAsync(String containerName, String command, int row, int column);
+
+
+    /**
+     * Starts the exec command for a specific container instance within the current group asynchronously.
      */
     interface Definition extends
         DefinitionStages.Blank,
@@ -254,6 +295,15 @@ public interface ContainerGroup extends
             WithFirstContainerInstance withNewAzureFileShareVolume(String volumeName, String shareName);
 
             /**
+             * Specifies an empty directory volume that can be shared by the container instances in the container group.
+             *
+             * @param name the name of the empty directory volume
+             * @return the next stage of the definition
+             */
+            @Beta(Beta.SinceVersion.V1_7_0)
+            WithFirstContainerInstance withEmptyDirectoryVolume(String name);
+
+            /**
              * Begins the definition of a volume that can be shared by the container instances in the container group.
              *
              * <p>
@@ -279,7 +329,6 @@ public interface ContainerGroup extends
              * @return the next stage of the definition
              */
             VolumeDefinitionStages.VolumeDefinitionBlank<WithVolume> defineVolume(String name);
-
         }
 
         /**
@@ -345,6 +394,76 @@ public interface ContainerGroup extends
                 WithVolumeAttach<ParentT> withStorageAccountKey(String storageAccountKey);
             }
 
+            /**
+             * The stage of the volume definition allowing to specify the secrets map.
+             *
+             * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+             */
+            interface WithSecretsMap<ParentT> {
+                /**
+                 * Specifies the secrets map.
+                 * <p>
+                 * The secret value must be specified in Base64 encoding
+                 *
+                 * @param secrets the new volume secrets map; value must be in Base64 encoding
+                 * @return the next stage of the definition
+                 */
+                @Beta(Beta.SinceVersion.V1_7_0)
+                WithVolumeAttach<ParentT> withSecrets(Map<String, String> secrets);
+            }
+
+            /**
+             * The stage of the volume definition allowing to specify the Git URL mappings.
+             *
+             * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+             */
+            interface WithGitUrl<ParentT> {
+                /**
+                 * Specifies the Git URL for the new volume.
+                 *
+                 * @param gitUrl the Git URL for the new volume
+                 * @return the next stage of the definition
+                 */
+                @Beta(Beta.SinceVersion.V1_7_0)
+                WithGitDirectoryName<ParentT> withGitUrl(String gitUrl);
+            }
+
+            /**
+             * The stage of the volume definition allowing to specify the Git target directory name mappings.
+             *
+             * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+             */
+            interface WithGitDirectoryName<ParentT> extends WithGitRevision<ParentT> {
+                /**
+                 * Specifies the Git target directory name for the new volume.
+                 * <p>
+                 * Must not contain or start with '..'.  If '.' is supplied, the volume directory will be the
+                 * git repository.  Otherwise, if specified, the volume will contain the git repository in the
+                 * subdirectory with the given name.
+                 *
+                 * @param gitDirectoryName the Git target directory name for the new volume
+                 * @return the next stage of the definition
+                 */
+                @Beta(Beta.SinceVersion.V1_7_0)
+                WithGitRevision<ParentT> withGitDirectoryName(String gitDirectoryName);
+            }
+
+            /**
+             * The stage of the volume definition allowing to specify the Git revision.
+             *
+             * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+             */
+            interface WithGitRevision<ParentT> extends WithVolumeAttach<ParentT> {
+                /**
+                 * Specifies the Git revision for the new volume.
+                 *
+                 * @param gitRevision the Git revision for the new volume
+                 * @return the next stage of the definition
+                 */
+                @Beta(Beta.SinceVersion.V1_7_0)
+                WithVolumeAttach<ParentT> withGitRevision(String gitRevision);
+            }
+
             /** The final stage of the volume definition.
              * <p>
              * At this stage, any remaining optional settings can be specified, or the subnet definition
@@ -363,6 +482,10 @@ public interface ContainerGroup extends
                     WithAzureFileShare<ParentT>,
                     WithStorageAccountName<ParentT>,
                     WithStorageAccountKey<ParentT>,
+                    WithSecretsMap<ParentT>,
+                    WithGitUrl<ParentT>,
+                    WithGitDirectoryName<ParentT>,
+                    WithGitRevision<ParentT>,
                     WithVolumeAttach<ParentT> {
             }
         }
@@ -476,6 +599,7 @@ public interface ContainerGroup extends
              *
              * @param <ParentT> the stage of the parent definition to return to after attaching this definition
              */
+            @Beta(Beta.SinceVersion.V1_8_0)
             interface WithPorts<ParentT> {
                 /**
                  * Specifies the container's TCP ports available to external clients.
@@ -530,7 +654,7 @@ public interface ContainerGroup extends
                 WithPortsOrContainerInstanceAttach<ParentT> withExternalUdpPort(int port);
 
                 /**
-                 * Specifies the container's ports are available to internal clients only (other container instances within the container group).
+                 * Specifies the container's TCP ports are available to internal clients only (other container instances within the container group).
                  * <p>
                  * Containers within a group can reach each other via localhost on the ports that they have exposed,
                  *   even if those ports are not exposed externally on the group's IP address.
@@ -538,10 +662,23 @@ public interface ContainerGroup extends
                  * @param ports array of TCP ports to be exposed internally
                  * @return the next stage of the definition
                  */
-                WithPortsOrContainerInstanceAttach<ParentT> withInternalPorts(int... ports);
+                @Beta(Beta.SinceVersion.V1_8_0)
+                WithPortsOrContainerInstanceAttach<ParentT> withInternalTcpPorts(int... ports);
 
                 /**
-                 * Specifies the container's port is available to internal clients only (other container instances within the container group).
+                 * Specifies the container's Udp ports are available to internal clients only (other container instances within the container group).
+                 * <p>
+                 * Containers within a group can reach each other via localhost on the ports that they have exposed,
+                 *   even if those ports are not exposed externally on the group's IP address.
+                 *
+                 * @param ports array of UDP ports to be exposed internally
+                 * @return the next stage of the definition
+                 */
+                @Beta(Beta.SinceVersion.V1_8_0)
+                WithPortsOrContainerInstanceAttach<ParentT> withInternalUdpPorts(int... ports);
+
+                /**
+                 * Specifies the container's TCP port is available to internal clients only (other container instances within the container group).
                  * <p>
                  * Containers within a group can reach each other via localhost on the ports that they have exposed,
                  *   even if those ports are not exposed externally on the group's IP address.
@@ -549,7 +686,20 @@ public interface ContainerGroup extends
                  * @param port TCP port to be exposed internally
                  * @return the next stage of the definition
                  */
-                WithPortsOrContainerInstanceAttach<ParentT> withInternalPort(int port);
+                @Beta(Beta.SinceVersion.V1_8_0)
+                WithPortsOrContainerInstanceAttach<ParentT> withInternalTcpPort(int port);
+
+                /**
+                 * Specifies the container's UDP port is available to internal clients only (other container instances within the container group).
+                 * <p>
+                 * Containers within a group can reach each other via localhost on the ports that they have exposed,
+                 *   even if those ports are not exposed externally on the group's IP address.
+                 *
+                 * @param port UDP port to be exposed internally
+                 * @return the next stage of the definition
+                 */
+                @Beta(Beta.SinceVersion.V1_8_0)
+                WithPortsOrContainerInstanceAttach<ParentT> withInternalUdpPort(int port);
             }
 
             /**
@@ -596,18 +746,20 @@ public interface ContainerGroup extends
                 /**
                  * Specifies the starting command lines.
                  *
-                 * @param commandLines the starting command lines the container will execute after it gets initialized
+                 * @param executable the executable which it will call after initializing the container
+                 * @param parameters the parameter list for the executable to be called
                  * @return the next stage of the definition
                  */
-                WithContainerInstanceAttach<ParentT> withStartingCommandLines(String... commandLines);
+                @Beta(Beta.SinceVersion.V1_11_0)
+                WithContainerInstanceAttach<ParentT> withStartingCommandLine(String executable, String... parameters);
 
                 /**
                  * Specifies the starting command line.
                  *
-                 * @param commandLine the starting command line the container will execute after it gets initialized
+                 * @param executable the executable or path to the executable that will be called after initializing the container
                  * @return the next stage of the definition
                  */
-                WithContainerInstanceAttach<ParentT> withStartingCommandLine(String commandLine);
+                WithContainerInstanceAttach<ParentT> withStartingCommandLine(String executable);
             }
 
             /**
@@ -737,13 +889,36 @@ public interface ContainerGroup extends
         }
 
         /**
+         * The stage of the container group definition allowing to specify the DNS prefix label.
+         */
+        interface WithDnsPrefix {
+            /**
+             * Specifies the DNS prefix to be used to create the FQDN for the container group.
+             *
+             * @param dnsPrefix the DNS prefix to be used to create the FQDN for the container group
+             * @return the next stage of the definition
+             */
+            WithCreate withDnsPrefix(String dnsPrefix);
+        }
+
+        /**
          * The stage of the definition which contains all the minimum required inputs for the resource to be created
          *   (via {@link WithCreate#create()}), but also allows for any other optional settings to be specified.
          */
         interface WithCreate extends
             WithRestartPolicy,
+            WithDnsPrefix,
             Creatable<ContainerGroup>,
             Resource.DefinitionWithTags<WithCreate> {
         }
     }
+
+    /**
+     * The template for an update operation, containing all the settings that can be modified.
+     */
+    interface Update extends
+        Resource.UpdateWithTags<Update>,
+        Appliable<ContainerGroup> {
+    }
+
 }

@@ -24,7 +24,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 })
 public class RuleDataSource {
     /**
-     * the resource identifier of the resource the rule monitors.
+     * the resource identifier of the resource the rule monitors. **NOTE**:
+     * this property cannot be updated for an existing rule.
      */
     @JsonProperty(value = "resourceUri")
     private String resourceUri;

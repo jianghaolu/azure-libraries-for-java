@@ -90,7 +90,6 @@ public interface KubernetesCluster extends
      */
     Map<String, KubernetesClusterAgentPool> agentPools();
 
-
     // Fluent interfaces
 
     /**
@@ -135,9 +134,19 @@ public interface KubernetesCluster extends
             /**
              * Specifies the version for the Kubernetes cluster.
              *
+             * @param kubernetesVersion the kubernetes version
              * @return the next stage of the definition
              */
+            @Deprecated
             WithLinuxRootUsername withVersion(KubernetesVersion kubernetesVersion);
+
+            /**
+             * Specifies the version for the Kubernetes cluster.
+             *
+             * @param kubernetesVersion the kubernetes version
+             * @return the next stage of the definition
+             */
+            WithLinuxRootUsername withVersion(String kubernetesVersion);
 
             /**
              * Uses the latest version for the Kubernetes cluster.

@@ -6,7 +6,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.microsoft.azure</groupId>
-  <version>1.5.2-SNAPSHOT</version>
+  <version>1.13.1-SNAPSHOT</version>
   <artifactId>azure-parent</artifactId>
   <packaging>pom</packaging>
 
@@ -42,6 +42,29 @@
     </developer>
   </developers>
 
+  <repositories>
+    <repository>
+      <id>ossrh</id>
+      <name>Sonatype Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <name>Sonatype Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <uniqueVersion>true</uniqueVersion>
+      <layout>default</layout>
+    </snapshotRepository>
+  </distributionManagement>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -72,17 +95,27 @@
       <dependency>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>azure-client-runtime</artifactId>
-        <version>1.2.1</version>
+        <version>1.5.4</version>
       </dependency>
       <dependency>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>azure-client-authentication</artifactId>
-        <version>1.2.1</version>
+        <version>1.5.4</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>20.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-keyvault</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-storage</artifactId>
+        <version>6.1.0</version>
       </dependency>
       <!-- Test dependencies -->
       <dependency>
@@ -100,7 +133,23 @@
       <dependency>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>azure-annotations</artifactId>
-        <version>1.5.1</version>
+        <version>1.7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jgit</groupId>
+        <artifactId>org.eclipse.jgit</artifactId>
+        <version>4.5.0.201609210915-r</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-net</groupId>
+        <artifactId>commons-net</artifactId>
+        <version>3.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -177,9 +226,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.8</version>
+        <version>3.0.0</version>
         <configuration>
-          <excludePackageNames>*.implementation.*;*.utils.*;com.microsoft.schemas._2003._10.serialization;*.blob.core.storage</excludePackageNames>
+          <doctitle>Microsoft Azure Management Libraries for Java ${project.version}</doctitle>
+          <windowtitle>Microsoft Azure Management Libraries for Java ${project.version}</windowtitle>
+          <additionalparam>-Xdoclint:none</additionalparam>
+          <excludePackageNames>*.samples;*.implementation.*;*.utils.*;com.microsoft.azure.utility;*.management.billing;*.management.cognitiveservices;*.management.consumption;*.management.customerinsights;*.management.devices;*.management.devtestlab;*.management.insights;*.management.logic;*.management.machinelearning;*.management.notificationhubs;*.management.powerbi;*.management.recoveryservices;*.management.relay;*.management.scheduler;*.management.servicefabric;*.management.streamanalytics</excludePackageNames>
           <bottom><![CDATA[<code>/**
 <br />* Copyright (c) Microsoft Corporation. All rights reserved.
 <br />* Licensed under the MIT License. See License.txt in the project root for
@@ -217,6 +269,23 @@
     </plugins>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>3.1.1</version>
+          <configuration>
+            <includeFilterFile>${project.parent.basedir}/spotbugs-includeFilter.xml</includeFilterFile>
+            <excludeFilterFile>${project.parent.basedir}/spotbugs-excludeFilter.xml</excludeFilterFile>
+          </configuration>
+          <dependencies>
+            <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+            <dependency>
+              <groupId>com.github.spotbugs</groupId>
+              <artifactId>spotbugs</artifactId>
+              <version>3.1.1</version>
+            </dependency>
+          </dependencies>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
@@ -290,6 +359,12 @@
             </filesets>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>com.microsoft.azure</groupId>
+          <artifactId>bundler-maven-plugin</artifactId>
+          <version>0.0.4</version>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -339,6 +414,7 @@
   <modules>
     <module>./azure</module>
     <module>./azure-samples</module>
+    <module>./azure-mgmt-apimanagement</module>
     <module>./azure-mgmt-appservice</module>
     <module>./azure-mgmt-batch</module>
     <module>./azure-mgmt-batchai</module>

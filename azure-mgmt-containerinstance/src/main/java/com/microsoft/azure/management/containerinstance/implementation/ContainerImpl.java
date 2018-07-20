@@ -9,6 +9,7 @@ import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.containerinstance.Container;
 import com.microsoft.azure.management.containerinstance.ContainerGroup;
 import com.microsoft.azure.management.containerinstance.ContainerGroupNetworkProtocol;
+import com.microsoft.azure.management.containerinstance.ContainerNetworkProtocol;
 import com.microsoft.azure.management.containerinstance.ContainerPort;
 import com.microsoft.azure.management.containerinstance.EnvironmentVariable;
 import com.microsoft.azure.management.containerinstance.IpAddress;
@@ -76,16 +77,18 @@ class ContainerImpl implements
         ensureParentIpAddress().ports().add(new Port()
             .withPort(port)
             .withProtocol(ContainerGroupNetworkProtocol.TCP));
-        this.withInternalPort(port);
+        this.withInternalTcpPort(port);
 
         return this;
     }
 
     private IpAddress ensureParentIpAddress() {
         if (parent.inner().ipAddress() == null) {
-            parent.inner().withIpAddress(new IpAddress()
-                .withType("Public")
-                .withPorts(new ArrayList<Port>()));
+            parent.inner().withIpAddress(new IpAddress());
+        }
+        parent.inner().ipAddress().withType("Public");
+        if (parent.inner().ipAddress().ports() == null) {
+            parent.inner().ipAddress().withPorts(new ArrayList<Port>());
         }
 
         return parent.inner().ipAddress();
@@ -105,26 +108,45 @@ class ContainerImpl implements
         ensureParentIpAddress().ports().add(new Port()
             .withPort(port)
             .withProtocol(ContainerGroupNetworkProtocol.UDP));
-        this.withInternalPort(port);
+        this.withInternalUdpPort(port);
 
         return this;
     }
 
     @Override
-    public ContainerImpl withInternalPorts(int... ports) {
+    public ContainerImpl withInternalTcpPorts(int... ports) {
         for (int port : ports) {
-            this.withInternalPort(port);
+            this.withInternalTcpPort(port);
         }
 
         return this;
     }
 
     @Override
-    public ContainerImpl withInternalPort(int port) {
+    public ContainerImpl withInternalUdpPorts(int... ports) {
+        for (int port : ports) {
+            this.withInternalUdpPort(port);
+        }
+
+        return this;
+    }
+
+    @Override
+    public ContainerImpl withInternalTcpPort(int port) {
         if (innerContainer.ports() == null) {
             innerContainer.withPorts(new ArrayList<ContainerPort>());
         }
-        innerContainer.ports().add(new ContainerPort().withPort(port));
+        innerContainer.ports().add(new ContainerPort().withPort(port).withProtocol(ContainerNetworkProtocol.TCP));
+
+        return this;
+    }
+
+    @Override
+    public ContainerImpl withInternalUdpPort(int port) {
+        if (innerContainer.ports() == null) {
+            innerContainer.withPorts(new ArrayList<ContainerPort>());
+        }
+        innerContainer.ports().add(new ContainerPort().withPort(port).withProtocol(ContainerNetworkProtocol.UDP));
 
         return this;
     }
@@ -144,9 +166,12 @@ class ContainerImpl implements
     }
 
     @Override
-    public ContainerImpl withStartingCommandLines(String... commandLines) {
-        for (String command : commandLines) {
-            this.withStartingCommandLine(command);
+    public ContainerImpl withStartingCommandLine(String executable, String... parameters) {
+        this.withStartingCommandLine(executable);
+        if (parameters != null) {
+            for (String parameter : parameters) {
+                this.withStartingCommandLine(parameter);
+            }
         }
 
         return this;

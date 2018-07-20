@@ -161,31 +161,29 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
     }
 
     /**
-     * The ResourceGroupsInner object to access its operations.
-     */
-    private ResourceGroupsInner resourceGroups;
-
-    /**
-     * Gets the ResourceGroupsInner object to access its operations.
-     *
-     * @return the ResourceGroupsInner object.
-     */
-    public ResourceGroupsInner resourceGroups() {
-        return this.resourceGroups;
-    }
-
-    /**
      * The ResourcesInner object to access its operations.
      */
     private ResourcesInner resources;
 
     /**
      * Gets the ResourcesInner object to access its operations.
-     *
      * @return the ResourcesInner object.
      */
     public ResourcesInner resources() {
         return this.resources;
+    }
+
+    /**
+     * The ResourceGroupsInner object to access its operations.
+     */
+    private ResourceGroupsInner resourceGroups;
+
+    /**
+     * Gets the ResourceGroupsInner object to access its operations.
+     * @return the ResourceGroupsInner object.
+     */
+    public ResourceGroupsInner resourceGroups() {
+        return this.resourceGroups;
     }
 
     /**
@@ -244,23 +242,27 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
         this(httpPipeline, null);
     }
 
-    /**
-     * Initializes an instance of ResourceManagementClient client.
-     *
-     * @param httpPipeline The HTTP pipeline to send requests through.
-     * @param azureEnvironment The environment that requests will target.
-     */
-    public ResourceManagementClientImpl(HttpPipeline httpPipeline, AzureEnvironment azureEnvironment) {
-        super(httpPipeline, azureEnvironment);
-        this.apiVersion = "2016-09-01";
+    protected void initialize() {
+        this.apiVersion = "2017-05-10";
         this.acceptLanguage = "en-US";
         this.longRunningOperationRetryTimeout = 30;
         this.generateClientRequestId = true;
-        this.deployments = new DeploymentsInner(this);
-        this.providers = new ProvidersInner(this);
-        this.resourceGroups = new ResourceGroupsInner(this);
-        this.resources = new ResourcesInner(this);
-        this.tags = new TagsInner(this);
-        this.deploymentOperations = new DeploymentOperationsInner(this);
+        this.deployments = new DeploymentsInner(restClient().retrofit(), this);
+        this.providers = new ProvidersInner(restClient().retrofit(), this);
+        this.resources = new ResourcesInner(restClient().retrofit(), this);
+        this.resourceGroups = new ResourceGroupsInner(restClient().retrofit(), this);
+        this.tags = new TagsInner(restClient().retrofit(), this);
+        this.deploymentOperations = new DeploymentOperationsInner(restClient().retrofit(), this);
+        this.azureClient = new AzureClient(this);
+    }
+
+    /**
+     * Gets the User-Agent header for the client.
+     *
+     * @return the user agent string.
+     */
+    @Override
+    public String userAgent() {
+        return String.format("%s (%s, %s)", super.userAgent(), "ResourceManagementClient", "2017-05-10");
     }
 }

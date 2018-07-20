@@ -5,7 +5,6 @@
  */
 package com.microsoft.azure.management.containerservice.implementation;
 
-import com.google.common.io.BaseEncoding;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.containerservice.ContainerServiceAgentPoolProfile;
 import com.microsoft.azure.management.containerservice.ContainerServiceLinuxProfile;
@@ -16,18 +15,14 @@ import com.microsoft.azure.management.containerservice.KeyVaultSecretRef;
 import com.microsoft.azure.management.containerservice.KubernetesCluster;
 import com.microsoft.azure.management.containerservice.KubernetesClusterAgentPool;
 import com.microsoft.azure.management.containerservice.KubernetesVersion;
-import com.microsoft.azure.management.containerservice.OrchestratorVersionProfile;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.GroupableResourceImpl;
 import rx.Observable;
-import rx.functions.Action2;
-import rx.functions.Func0;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * The implementation for KubernetesCluster and its create and update interfaces.
@@ -44,7 +39,8 @@ public class KubernetesClusterImpl extends
     KubernetesCluster.Definition,
     KubernetesCluster.Update {
 
-    private boolean useLatestVersion;
+    private byte[] adminKubeConfigContent;
+    private byte[] userKubeConfigContent;
 
     protected KubernetesClusterImpl(String name, ManagedClusterInner innerObject, ContainerServiceManager manager) {
         super(name, innerObject, manager);
@@ -52,7 +48,8 @@ public class KubernetesClusterImpl extends
             this.inner().withAgentPoolProfiles(new ArrayList<ContainerServiceAgentPoolProfile>());
         }
 
-        this.useLatestVersion = false;
+        this.adminKubeConfigContent = null;
+        this.userKubeConfigContent = null;
     }
 
     @Override
@@ -77,24 +74,20 @@ public class KubernetesClusterImpl extends
 
     @Override
     public byte[] adminKubeConfigContent() {
-        if (this.inner().accessProfiles() == null
-            || this.inner().accessProfiles().clusterAdmin() == null
-            || this.inner().accessProfiles().clusterAdmin().kubeConfig() == null) {
-            return new byte[0];
-        } else {
-            return BaseEncoding.base64().decode(this.inner().accessProfiles().clusterAdmin().kubeConfig());
+        if (this.adminKubeConfigContent == null) {
+            this.adminKubeConfigContent = this.manager().kubernetesClusters()
+                .getAdminKubeConfigContent(this.resourceGroupName(), this.name());
         }
+        return this.adminKubeConfigContent;
     }
 
     @Override
     public byte[] userKubeConfigContent() {
-        if (this.inner().accessProfiles() == null
-            || this.inner().accessProfiles().clusterUser() == null
-            || this.inner().accessProfiles().clusterUser().kubeConfig() == null) {
-            return new byte[0];
-        } else {
-            return BaseEncoding.base64().decode(this.inner().accessProfiles().clusterUser().kubeConfig());
+        if (this.userKubeConfigContent == null) {
+            this.userKubeConfigContent = this.manager().kubernetesClusters()
+                .getUserKubeConfigContent(this.resourceGroupName(), this.name());
         }
+        return this.userKubeConfigContent;
     }
 
     @Override
@@ -157,10 +150,49 @@ public class KubernetesClusterImpl extends
         return Collections.unmodifiableMap(agentPoolMap);
     }
 
+    private Observable<byte[]> getAdminConfig(final KubernetesClusterImpl self) {
+        return this.manager().kubernetesClusters()
+            .getAdminKubeConfigContentAsync(self.resourceGroupName(), self.name())
+            .map(new Func1<byte[], byte[]>() {
+                @Override
+                public byte[] call(byte[] kubeConfigContent) {
+                    self.adminKubeConfigContent = kubeConfigContent;
+                    return self.adminKubeConfigContent;
+                }
+            });
+    }
+
+    private Observable<byte[]> getUserConfig(final KubernetesClusterImpl self) {
+        return this.manager().kubernetesClusters()
+            .getUserKubeConfigContentAsync(self.resourceGroupName(), self.name())
+            .map(new Func1<byte[], byte[]>() {
+                @Override
+                public byte[] call(byte[] kubeConfigContent) {
+                    self.userKubeConfigContent = kubeConfigContent;
+                    return self.userKubeConfigContent;
+                }
+            });
+    }
+
 
     @Override
     protected Observable<ManagedClusterInner> getInnerAsync() {
-        return this.manager().inner().managedClusters().getByResourceGroupAsync(this.resourceGroupName(), this.name());
+        final KubernetesClusterImpl self = this;
+        final Observable<byte[]> adminConfig = getAdminConfig(self);
+        final Observable<byte[]> userConfig = getUserConfig(self);
+        return this.manager().inner().managedClusters().getByResourceGroupAsync(this.resourceGroupName(), this.name())
+            .flatMap(new Func1<ManagedClusterInner, Observable<ManagedClusterInner>>() {
+                @Override
+                public Observable<ManagedClusterInner> call(final ManagedClusterInner managedClusterInner) {
+                    return Observable.merge(adminConfig, userConfig).last()
+                        .map(new Func1<byte[], ManagedClusterInner>() {
+                            @Override
+                            public ManagedClusterInner call(byte[] bytes) {
+                                return managedClusterInner;
+                            }
+                        });
+                }
+            });
     }
 
     @Override
@@ -169,41 +201,16 @@ public class KubernetesClusterImpl extends
         if (!this.isInCreateMode()) {
             this.inner().withServicePrincipalProfile(null);
         }
+        final Observable<byte[]> adminConfig = getAdminConfig(self);
+        final Observable<byte[]> userConfig = getUserConfig(self);
+        final Observable<KubernetesCluster> mergedConfigs = Observable.merge(adminConfig, userConfig).last()
+            .map(new Func1<byte[], KubernetesCluster>() {
+                @Override
+                public KubernetesCluster call(byte[] bytes) {
+                    return self;
+                }
+            });
 
-        if (useLatestVersion) {
-            return this.manager().inner().containerServices().listOrchestratorsAsync(self.inner().location())
-                .collect(new Func0<TreeSet<String>>() {
-                    @Override
-                    public TreeSet<String> call() {
-                        return new TreeSet<String>();
-                    }
-                }, new Action2<TreeSet<String>, OrchestratorVersionProfileListResultInner>() {
-                    @Override
-                    public void call(TreeSet<String> kubernetesVersions, OrchestratorVersionProfileListResultInner inner) {
-                        if (inner != null && inner.orchestrators() != null && inner.orchestrators().size() > 0) {
-                            for (OrchestratorVersionProfile orchestrator : inner.orchestrators()) {
-                                if (orchestrator.orchestratorType().equals("Kubernetes")) {
-                                    kubernetesVersions.add(orchestrator.orchestratorVersion());
-                                }
-                            }
-                        }
-                    }
-                }).last()
-                .flatMap(new Func1<TreeSet<String>, Observable<KubernetesCluster>>() {
-                    @Override
-                    public Observable<KubernetesCluster> call(TreeSet<String> kubernetesVersions) {
-                        self.inner().withKubernetesVersion(kubernetesVersions.last());
-                        return self.manager().inner().managedClusters().createOrUpdateAsync(self.resourceGroupName(), self.name(), self.inner())
-                            .map(new Func1<ManagedClusterInner, KubernetesCluster>() {
-                                @Override
-                                public KubernetesCluster call(ManagedClusterInner inner) {
-                                    self.setInner(inner);
-                                    return self;
-                                }
-                            });
-                    }
-                });
-        } else {
             return this.manager().inner().managedClusters().createOrUpdateAsync(self.resourceGroupName(), self.name(), self.inner())
                 .map(new Func1<ManagedClusterInner, KubernetesCluster>() {
                     @Override
@@ -211,8 +218,12 @@ public class KubernetesClusterImpl extends
                         self.setInner(inner);
                         return self;
                     }
+                }).flatMap(new Func1<KubernetesCluster, Observable<KubernetesCluster>>() {
+                    @Override
+                    public Observable<KubernetesCluster> call(KubernetesCluster kubernetesCluster) {
+                        return mergedConfigs;
+                    }
                 });
-        }
     }
 
     @Override
@@ -222,8 +233,14 @@ public class KubernetesClusterImpl extends
     }
 
     @Override
+    public KubernetesClusterImpl withVersion(String kubernetesVersion) {
+        this.inner().withKubernetesVersion(kubernetesVersion);
+        return this;
+    }
+
+    @Override
     public KubernetesClusterImpl withLatestVersion() {
-        this.useLatestVersion = true;
+        this.inner().withKubernetesVersion("");
         return this;
     }
 

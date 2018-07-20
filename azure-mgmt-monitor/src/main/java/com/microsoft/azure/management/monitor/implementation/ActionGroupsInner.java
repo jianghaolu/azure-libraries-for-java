@@ -10,10 +10,13 @@ package com.microsoft.azure.management.monitor.implementation;
 
 import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsGet;
 import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsDelete;
+import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsListing;
 import retrofit2.Retrofit;
 import com.google.common.reflect.TypeToken;
-import com.microsoft.azure.CloudException;
 import com.microsoft.azure.management.monitor.EnableRequest;
+import com.microsoft.azure.management.monitor.ErrorResponseException;
+import com.microsoft.azure.Page;
+import com.microsoft.azure.PagedList;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
@@ -26,6 +29,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.HTTP;
+import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -38,7 +42,7 @@ import rx.Observable;
  * An instance of this class provides access to all the operations defined
  * in ActionGroups.
  */
-public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceInner>, InnerSupportsDelete<Void> {
+public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceInner>, InnerSupportsDelete<Void>, InnerSupportsListing<ActionGroupResourceInner> {
     /** The Retrofit service to perform REST calls. */
     private ActionGroupsService service;
     /** The service client containing this operation class. */
@@ -72,9 +76,13 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
         @HTTP(path = "subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups/{actionGroupName}", method = "DELETE", hasBody = true)
         Observable<Response<ResponseBody>> delete(@Path("resourceGroupName") String resourceGroupName, @Path("actionGroupName") String actionGroupName, @Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
-        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.monitor.ActionGroups listBySubscriptionId" })
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.monitor.ActionGroups update" })
+        @PATCH("subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups/{actionGroupName}")
+        Observable<Response<ResponseBody>> update(@Path("subscriptionId") String subscriptionId, @Path("resourceGroupName") String resourceGroupName, @Path("actionGroupName") String actionGroupName, @Query("api-version") String apiVersion, @Body ActionGroupPatchBodyInner actionGroupPatch, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.monitor.ActionGroups list" })
         @GET("subscriptions/{subscriptionId}/providers/microsoft.insights/actionGroups")
-        Observable<Response<ResponseBody>> listBySubscriptionId(@Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        Observable<Response<ResponseBody>> list(@Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.monitor.ActionGroups listByResourceGroup" })
         @GET("subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups")
@@ -93,7 +101,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      * @param actionGroupName The name of the action group.
      * @param actionGroup The action group to create or use for the update.
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
+     * @throws ErrorResponseException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ActionGroupResourceInner object if successful.
      */
@@ -156,7 +164,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
             throw new IllegalArgumentException("Parameter actionGroup is required and cannot be null.");
         }
         Validator.validate(actionGroup);
-        final String apiVersion = "2017-04-01";
+        final String apiVersion = "2018-03-01";
         return service.createOrUpdate(resourceGroupName, actionGroupName, this.client.subscriptionId(), actionGroup, apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ActionGroupResourceInner>>>() {
                 @Override
@@ -171,11 +179,11 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
             });
     }
 
-    private ServiceResponse<ActionGroupResourceInner> createOrUpdateDelegate(Response<ResponseBody> response) throws CloudException, IOException, IllegalArgumentException {
-        return this.client.restClient().responseBuilderFactory().<ActionGroupResourceInner, CloudException>newInstance(this.client.serializerAdapter())
+    private ServiceResponse<ActionGroupResourceInner> createOrUpdateDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<ActionGroupResourceInner, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<ActionGroupResourceInner>() { }.getType())
                 .register(201, new TypeToken<ActionGroupResourceInner>() { }.getType())
-                .registerError(CloudException.class)
+                .registerError(ErrorResponseException.class)
                 .build(response);
     }
 
@@ -185,7 +193,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      * @param resourceGroupName The name of the resource group.
      * @param actionGroupName The name of the action group.
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
+     * @throws ErrorResponseException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the ActionGroupResourceInner object if successful.
      */
@@ -241,7 +249,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2017-04-01";
+        final String apiVersion = "2018-03-01";
         return service.getByResourceGroup(resourceGroupName, actionGroupName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ActionGroupResourceInner>>>() {
                 @Override
@@ -256,11 +264,10 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
             });
     }
 
-    private ServiceResponse<ActionGroupResourceInner> getByResourceGroupDelegate(Response<ResponseBody> response) throws CloudException, IOException, IllegalArgumentException {
-        return this.client.restClient().responseBuilderFactory().<ActionGroupResourceInner, CloudException>newInstance(this.client.serializerAdapter())
+    private ServiceResponse<ActionGroupResourceInner> getByResourceGroupDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<ActionGroupResourceInner, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<ActionGroupResourceInner>() { }.getType())
-                .register(404, new TypeToken<Void>() { }.getType())
-                .registerError(CloudException.class)
+                .registerError(ErrorResponseException.class)
                 .build(response);
     }
 
@@ -270,7 +277,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      * @param resourceGroupName The name of the resource group.
      * @param actionGroupName The name of the action group.
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
+     * @throws ErrorResponseException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      */
     public void delete(String resourceGroupName, String actionGroupName) {
@@ -325,7 +332,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2017-04-01";
+        final String apiVersion = "2018-03-01";
         return service.delete(resourceGroupName, actionGroupName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Void>>>() {
                 @Override
@@ -340,48 +347,145 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
             });
     }
 
-    private ServiceResponse<Void> deleteDelegate(Response<ResponseBody> response) throws CloudException, IOException, IllegalArgumentException {
-        return this.client.restClient().responseBuilderFactory().<Void, CloudException>newInstance(this.client.serializerAdapter())
+    private ServiceResponse<Void> deleteDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<Void, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<Void>() { }.getType())
                 .register(204, new TypeToken<Void>() { }.getType())
-                .registerError(CloudException.class)
+                .registerError(ErrorResponseException.class)
+                .build(response);
+    }
+
+    /**
+     * Updates an existing action group's tags. To update other fields use the CreateOrUpdate method.
+     *
+     * @param resourceGroupName The name of the resource group.
+     * @param actionGroupName The name of the action group.
+     * @param actionGroupPatch Parameters supplied to the operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws ErrorResponseException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the ActionGroupResourceInner object if successful.
+     */
+    public ActionGroupResourceInner update(String resourceGroupName, String actionGroupName, ActionGroupPatchBodyInner actionGroupPatch) {
+        return updateWithServiceResponseAsync(resourceGroupName, actionGroupName, actionGroupPatch).toBlocking().single().body();
+    }
+
+    /**
+     * Updates an existing action group's tags. To update other fields use the CreateOrUpdate method.
+     *
+     * @param resourceGroupName The name of the resource group.
+     * @param actionGroupName The name of the action group.
+     * @param actionGroupPatch Parameters supplied to the operation.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    public ServiceFuture<ActionGroupResourceInner> updateAsync(String resourceGroupName, String actionGroupName, ActionGroupPatchBodyInner actionGroupPatch, final ServiceCallback<ActionGroupResourceInner> serviceCallback) {
+        return ServiceFuture.fromResponse(updateWithServiceResponseAsync(resourceGroupName, actionGroupName, actionGroupPatch), serviceCallback);
+    }
+
+    /**
+     * Updates an existing action group's tags. To update other fields use the CreateOrUpdate method.
+     *
+     * @param resourceGroupName The name of the resource group.
+     * @param actionGroupName The name of the action group.
+     * @param actionGroupPatch Parameters supplied to the operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ActionGroupResourceInner object
+     */
+    public Observable<ActionGroupResourceInner> updateAsync(String resourceGroupName, String actionGroupName, ActionGroupPatchBodyInner actionGroupPatch) {
+        return updateWithServiceResponseAsync(resourceGroupName, actionGroupName, actionGroupPatch).map(new Func1<ServiceResponse<ActionGroupResourceInner>, ActionGroupResourceInner>() {
+            @Override
+            public ActionGroupResourceInner call(ServiceResponse<ActionGroupResourceInner> response) {
+                return response.body();
+            }
+        });
+    }
+
+    /**
+     * Updates an existing action group's tags. To update other fields use the CreateOrUpdate method.
+     *
+     * @param resourceGroupName The name of the resource group.
+     * @param actionGroupName The name of the action group.
+     * @param actionGroupPatch Parameters supplied to the operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the ActionGroupResourceInner object
+     */
+    public Observable<ServiceResponse<ActionGroupResourceInner>> updateWithServiceResponseAsync(String resourceGroupName, String actionGroupName, ActionGroupPatchBodyInner actionGroupPatch) {
+        if (this.client.subscriptionId() == null) {
+            throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
+        }
+        if (resourceGroupName == null) {
+            throw new IllegalArgumentException("Parameter resourceGroupName is required and cannot be null.");
+        }
+        if (actionGroupName == null) {
+            throw new IllegalArgumentException("Parameter actionGroupName is required and cannot be null.");
+        }
+        if (actionGroupPatch == null) {
+            throw new IllegalArgumentException("Parameter actionGroupPatch is required and cannot be null.");
+        }
+        Validator.validate(actionGroupPatch);
+        final String apiVersion = "2018-03-01";
+        return service.update(this.client.subscriptionId(), resourceGroupName, actionGroupName, apiVersion, actionGroupPatch, this.client.acceptLanguage(), this.client.userAgent())
+            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<ActionGroupResourceInner>>>() {
+                @Override
+                public Observable<ServiceResponse<ActionGroupResourceInner>> call(Response<ResponseBody> response) {
+                    try {
+                        ServiceResponse<ActionGroupResourceInner> clientResponse = updateDelegate(response);
+                        return Observable.just(clientResponse);
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                }
+            });
+    }
+
+    private ServiceResponse<ActionGroupResourceInner> updateDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<ActionGroupResourceInner, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<ActionGroupResourceInner>() { }.getType())
+                .registerError(ErrorResponseException.class)
                 .build(response);
     }
 
     /**
      * Get a list of all action groups in a subscription.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the List&lt;ActionGroupResourceInner&gt; object if successful.
+     * @return the PagedList<ActionGroupResourceInner> object if successful.
      */
-    public List<ActionGroupResourceInner> listBySubscriptionId() {
-        return listBySubscriptionIdWithServiceResponseAsync().toBlocking().single().body();
+    public PagedList<ActionGroupResourceInner> list() {
+        PageImpl1<ActionGroupResourceInner> page = new PageImpl1<>();
+        page.setItems(listWithServiceResponseAsync().toBlocking().single().body());
+        page.setNextPageLink(null);
+        return new PagedList<ActionGroupResourceInner>(page) {
+            @Override
+            public Page<ActionGroupResourceInner> nextPage(String nextPageLink) {
+                return null;
+            }
+        };
     }
 
     /**
      * Get a list of all action groups in a subscription.
      *
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
-    public ServiceFuture<List<ActionGroupResourceInner>> listBySubscriptionIdAsync(final ServiceCallback<List<ActionGroupResourceInner>> serviceCallback) {
-        return ServiceFuture.fromResponse(listBySubscriptionIdWithServiceResponseAsync(), serviceCallback);
+    public ServiceFuture<List<ActionGroupResourceInner>> listAsync(final ServiceCallback<List<ActionGroupResourceInner>> serviceCallback) {
+        return ServiceFuture.fromResponse(listWithServiceResponseAsync(), serviceCallback);
     }
 
     /**
      * Get a list of all action groups in a subscription.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ActionGroupResourceInner&gt; object
      */
-    public Observable<List<ActionGroupResourceInner>> listBySubscriptionIdAsync() {
-        return listBySubscriptionIdWithServiceResponseAsync().map(new Func1<ServiceResponse<List<ActionGroupResourceInner>>, List<ActionGroupResourceInner>>() {
+    public Observable<Page<ActionGroupResourceInner>> listAsync() {
+        return listWithServiceResponseAsync().map(new Func1<ServiceResponse<List<ActionGroupResourceInner>>, Page<ActionGroupResourceInner>>() {
             @Override
-            public List<ActionGroupResourceInner> call(ServiceResponse<List<ActionGroupResourceInner>> response) {
-                return response.body();
+            public Page<ActionGroupResourceInner> call(ServiceResponse<List<ActionGroupResourceInner>> response) {
+                PageImpl1<ActionGroupResourceInner> page = new PageImpl1<>();
+                page.setItems(response.body());
+                return page;
             }
         });
     }
@@ -389,20 +493,19 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
     /**
      * Get a list of all action groups in a subscription.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ActionGroupResourceInner&gt; object
      */
-    public Observable<ServiceResponse<List<ActionGroupResourceInner>>> listBySubscriptionIdWithServiceResponseAsync() {
+    public Observable<ServiceResponse<List<ActionGroupResourceInner>>> listWithServiceResponseAsync() {
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2017-04-01";
-        return service.listBySubscriptionId(this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
+        final String apiVersion = "2018-03-01";
+        return service.list(this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<ActionGroupResourceInner>>>>() {
                 @Override
                 public Observable<ServiceResponse<List<ActionGroupResourceInner>>> call(Response<ResponseBody> response) {
                     try {
-                        ServiceResponse<PageImpl1<ActionGroupResourceInner>> result = listBySubscriptionIdDelegate(response);
+                        ServiceResponse<PageImpl1<ActionGroupResourceInner>> result = listDelegate(response);
                         ServiceResponse<List<ActionGroupResourceInner>> clientResponse = new ServiceResponse<List<ActionGroupResourceInner>>(result.body().items(), result.response());
                         return Observable.just(clientResponse);
                     } catch (Throwable t) {
@@ -412,10 +515,10 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
             });
     }
 
-    private ServiceResponse<PageImpl1<ActionGroupResourceInner>> listBySubscriptionIdDelegate(Response<ResponseBody> response) throws CloudException, IOException, IllegalArgumentException {
-        return this.client.restClient().responseBuilderFactory().<PageImpl1<ActionGroupResourceInner>, CloudException>newInstance(this.client.serializerAdapter())
+    private ServiceResponse<PageImpl1<ActionGroupResourceInner>> listDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<PageImpl1<ActionGroupResourceInner>, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<PageImpl1<ActionGroupResourceInner>>() { }.getType())
-                .registerError(CloudException.class)
+                .registerError(ErrorResponseException.class)
                 .build(response);
     }
 
@@ -423,13 +526,18 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      * Get a list of all action groups in a resource group.
      *
      * @param resourceGroupName The name of the resource group.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the List&lt;ActionGroupResourceInner&gt; object if successful.
+     * @return the PagedList<ActionGroupResourceInner> object if successful.
      */
-    public List<ActionGroupResourceInner> listByResourceGroup(String resourceGroupName) {
-        return listByResourceGroupWithServiceResponseAsync(resourceGroupName).toBlocking().single().body();
+    public PagedList<ActionGroupResourceInner> listByResourceGroup(String resourceGroupName) {
+        PageImpl1<ActionGroupResourceInner> page = new PageImpl1<>();
+        page.setItems(listByResourceGroupWithServiceResponseAsync(resourceGroupName).toBlocking().single().body());
+        page.setNextPageLink(null);
+        return new PagedList<ActionGroupResourceInner>(page) {
+            @Override
+            public Page<ActionGroupResourceInner> nextPage(String nextPageLink) {
+                return null;
+            }
+        };
     }
 
     /**
@@ -437,7 +545,6 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      *
      * @param resourceGroupName The name of the resource group.
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
     public ServiceFuture<List<ActionGroupResourceInner>> listByResourceGroupAsync(String resourceGroupName, final ServiceCallback<List<ActionGroupResourceInner>> serviceCallback) {
@@ -448,14 +555,15 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      * Get a list of all action groups in a resource group.
      *
      * @param resourceGroupName The name of the resource group.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ActionGroupResourceInner&gt; object
      */
-    public Observable<List<ActionGroupResourceInner>> listByResourceGroupAsync(String resourceGroupName) {
-        return listByResourceGroupWithServiceResponseAsync(resourceGroupName).map(new Func1<ServiceResponse<List<ActionGroupResourceInner>>, List<ActionGroupResourceInner>>() {
+    public Observable<Page<ActionGroupResourceInner>> listByResourceGroupAsync(String resourceGroupName) {
+        return listByResourceGroupWithServiceResponseAsync(resourceGroupName).map(new Func1<ServiceResponse<List<ActionGroupResourceInner>>, Page<ActionGroupResourceInner>>() {
             @Override
-            public List<ActionGroupResourceInner> call(ServiceResponse<List<ActionGroupResourceInner>> response) {
-                return response.body();
+            public Page<ActionGroupResourceInner> call(ServiceResponse<List<ActionGroupResourceInner>> response) {
+                PageImpl1<ActionGroupResourceInner> page = new PageImpl1<>();
+                page.setItems(response.body());
+                return page;
             }
         });
     }
@@ -464,7 +572,6 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      * Get a list of all action groups in a resource group.
      *
      * @param resourceGroupName The name of the resource group.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;ActionGroupResourceInner&gt; object
      */
     public Observable<ServiceResponse<List<ActionGroupResourceInner>>> listByResourceGroupWithServiceResponseAsync(String resourceGroupName) {
@@ -474,7 +581,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2017-04-01";
+        final String apiVersion = "2018-03-01";
         return service.listByResourceGroup(resourceGroupName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<ActionGroupResourceInner>>>>() {
                 @Override
@@ -490,10 +597,10 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
             });
     }
 
-    private ServiceResponse<PageImpl1<ActionGroupResourceInner>> listByResourceGroupDelegate(Response<ResponseBody> response) throws CloudException, IOException, IllegalArgumentException {
-        return this.client.restClient().responseBuilderFactory().<PageImpl1<ActionGroupResourceInner>, CloudException>newInstance(this.client.serializerAdapter())
+    private ServiceResponse<PageImpl1<ActionGroupResourceInner>> listByResourceGroupDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<PageImpl1<ActionGroupResourceInner>, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<PageImpl1<ActionGroupResourceInner>>() { }.getType())
-                .registerError(CloudException.class)
+                .registerError(ErrorResponseException.class)
                 .build(response);
     }
 
@@ -504,7 +611,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
      * @param actionGroupName The name of the action group.
      * @param receiverName The name of the receiver to resubscribe.
      * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
+     * @throws ErrorResponseException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      */
     public void enableReceiver(String resourceGroupName, String actionGroupName, String receiverName) {
@@ -565,7 +672,7 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
         if (receiverName == null) {
             throw new IllegalArgumentException("Parameter receiverName is required and cannot be null.");
         }
-        final String apiVersion = "2017-04-01";
+        final String apiVersion = "2018-03-01";
         EnableRequest enableRequest = new EnableRequest();
         enableRequest.withReceiverName(receiverName);
         return service.enableReceiver(resourceGroupName, actionGroupName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), enableRequest, this.client.userAgent())
@@ -582,12 +689,11 @@ public class ActionGroupsInner implements InnerSupportsGet<ActionGroupResourceIn
             });
     }
 
-    private ServiceResponse<Void> enableReceiverDelegate(Response<ResponseBody> response) throws CloudException, IOException, IllegalArgumentException {
-        return this.client.restClient().responseBuilderFactory().<Void, CloudException>newInstance(this.client.serializerAdapter())
+    private ServiceResponse<Void> enableReceiverDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<Void, ErrorResponseException>newInstance(this.client.serializerAdapter())
                 .register(200, new TypeToken<Void>() { }.getType())
                 .register(409, new TypeToken<Void>() { }.getType())
-                .register(404, new TypeToken<Void>() { }.getType())
-                .registerError(CloudException.class)
+                .registerError(ErrorResponseException.class)
                 .build(response);
     }
 

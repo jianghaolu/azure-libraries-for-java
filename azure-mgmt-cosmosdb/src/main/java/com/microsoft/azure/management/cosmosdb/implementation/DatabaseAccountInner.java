@@ -12,13 +12,15 @@ import com.microsoft.azure.management.cosmosdb.DatabaseAccountKind;
 import com.microsoft.azure.management.cosmosdb.DatabaseAccountOfferType;
 import com.microsoft.azure.management.cosmosdb.ConsistencyPolicy;
 import java.util.List;
+import com.microsoft.azure.management.cosmosdb.Capability;
 import com.microsoft.azure.management.cosmosdb.Location;
+import com.microsoft.azure.management.cosmosdb.VirtualNetworkRule;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
 import com.microsoft.azure.Resource;
 
 /**
- * A DocumentDB database account.
+ * An Azure Cosmos DB database account.
  */
 @JsonFlatten
 public class DatabaseAccountInner extends Resource {
@@ -37,42 +39,62 @@ public class DatabaseAccountInner extends Resource {
     private String provisioningState;
 
     /**
-     * The connection endpoint for the DocumentDB database account.
+     * The connection endpoint for the Cosmos DB database account.
      */
     @JsonProperty(value = "properties.documentEndpoint", access = JsonProperty.Access.WRITE_ONLY)
     private String documentEndpoint;
 
     /**
-     * The offer type for the DocumentDB database account. Default value:
+     * The offer type for the Cosmos DB database account. Default value:
      * Standard. Possible values include: 'Standard'.
      */
     @JsonProperty(value = "properties.databaseAccountOfferType", access = JsonProperty.Access.WRITE_ONLY)
     private DatabaseAccountOfferType databaseAccountOfferType;
 
     /**
-     * DocumentDB Firewall Support: This value specifies the set of IP
-     * addresses or IP address ranges in CIDR form to be included as the
-     * allowed list of client IPs for a given database account. IP
-     * addresses/ranges must be comma separated and must not contain any
-     * spaces.
+     * Cosmos DB Firewall Support: This value specifies the set of IP addresses
+     * or IP address ranges in CIDR form to be included as the allowed list of
+     * client IPs for a given database account. IP addresses/ranges must be
+     * comma separated and must not contain any spaces.
      */
     @JsonProperty(value = "properties.ipRangeFilter")
     private String ipRangeFilter;
 
     /**
-     * The consistency policy for the DocumentDB database account.
+     * Flag to indicate whether to enable/disable Virtual Network ACL rules.
+     */
+    @JsonProperty(value = "properties.isVirtualNetworkFilterEnabled")
+    private Boolean isVirtualNetworkFilterEnabled;
+
+    /**
+     * Enables automatic failover of the write region in the rare event that
+     * the region is unavailable due to an outage. Automatic failover will
+     * result in a new write region for the account and is chosen based on the
+     * failover priorities configured for the account.
+     */
+    @JsonProperty(value = "properties.enableAutomaticFailover")
+    private Boolean enableAutomaticFailover;
+
+    /**
+     * The consistency policy for the Cosmos DB database account.
      */
     @JsonProperty(value = "properties.consistencyPolicy")
     private ConsistencyPolicy consistencyPolicy;
 
     /**
-     * An array that contains the write location for the DocumentDB account.
+     * List of Cosmos DB capabilities for the account.
+     */
+    @JsonProperty(value = "properties.capabilities")
+    private List<Capability> capabilities;
+
+    /**
+     * An array that contains the write location for the Cosmos DB account.
      */
     @JsonProperty(value = "properties.writeLocations", access = JsonProperty.Access.WRITE_ONLY)
     private List<Location> writeLocations;
 
     /**
-     * An array that contains of the read locations enabled for the DocumentDB
+     * An array that contains of the read locations enabled for the Cosmos DB
      * account.
      */
     @JsonProperty(value = "properties.readLocations", access = JsonProperty.Access.WRITE_ONLY)
@@ -83,6 +105,12 @@ public class DatabaseAccountInner extends Resource {
      */
     @JsonProperty(value = "properties.failoverPolicies", access = JsonProperty.Access.WRITE_ONLY)
     private List<FailoverPolicyInner> failoverPolicies;
+
+    /**
+     * List of Virtual Network ACL rules configured for the Cosmos DB account.
+     */
+    @JsonProperty(value = "properties.virtualNetworkRules")
+    private List<VirtualNetworkRule> virtualNetworkRules;
 
     /**
      * Get the kind value.
@@ -163,6 +191,46 @@ public class DatabaseAccountInner extends Resource {
     }
 
     /**
+     * Get the isVirtualNetworkFilterEnabled value.
+     *
+     * @return the isVirtualNetworkFilterEnabled value
+     */
+    public Boolean isVirtualNetworkFilterEnabled() {
+        return this.isVirtualNetworkFilterEnabled;
+    }
+
+    /**
+     * Set the isVirtualNetworkFilterEnabled value.
+     *
+     * @param isVirtualNetworkFilterEnabled the isVirtualNetworkFilterEnabled value to set
+     * @return the DatabaseAccountInner object itself.
+     */
+    public DatabaseAccountInner withIsVirtualNetworkFilterEnabled(Boolean isVirtualNetworkFilterEnabled) {
+        this.isVirtualNetworkFilterEnabled = isVirtualNetworkFilterEnabled;
+        return this;
+    }
+
+    /**
+     * Get the enableAutomaticFailover value.
+     *
+     * @return the enableAutomaticFailover value
+     */
+    public Boolean enableAutomaticFailover() {
+        return this.enableAutomaticFailover;
+    }
+
+    /**
+     * Set the enableAutomaticFailover value.
+     *
+     * @param enableAutomaticFailover the enableAutomaticFailover value to set
+     * @return the DatabaseAccountInner object itself.
+     */
+    public DatabaseAccountInner withEnableAutomaticFailover(Boolean enableAutomaticFailover) {
+        this.enableAutomaticFailover = enableAutomaticFailover;
+        return this;
+    }
+
+    /**
      * Get the consistencyPolicy value.
      *
      * @return the consistencyPolicy value
@@ -179,6 +247,26 @@ public class DatabaseAccountInner extends Resource {
      */
     public DatabaseAccountInner withConsistencyPolicy(ConsistencyPolicy consistencyPolicy) {
         this.consistencyPolicy = consistencyPolicy;
+        return this;
+    }
+
+    /**
+     * Get the capabilities value.
+     *
+     * @return the capabilities value
+     */
+    public List<Capability> capabilities() {
+        return this.capabilities;
+    }
+
+    /**
+     * Set the capabilities value.
+     *
+     * @param capabilities the capabilities value to set
+     * @return the DatabaseAccountInner object itself.
+     */
+    public DatabaseAccountInner withCapabilities(List<Capability> capabilities) {
+        this.capabilities = capabilities;
         return this;
     }
 
@@ -207,6 +295,26 @@ public class DatabaseAccountInner extends Resource {
      */
     public List<FailoverPolicyInner> failoverPolicies() {
         return this.failoverPolicies;
+    }
+
+    /**
+     * Get the virtualNetworkRules value.
+     *
+     * @return the virtualNetworkRules value
+     */
+    public List<VirtualNetworkRule> virtualNetworkRules() {
+        return this.virtualNetworkRules;
+    }
+
+    /**
+     * Set the virtualNetworkRules value.
+     *
+     * @param virtualNetworkRules the virtualNetworkRules value to set
+     * @return the DatabaseAccountInner object itself.
+     */
+    public DatabaseAccountInner withVirtualNetworkRules(List<VirtualNetworkRule> virtualNetworkRules) {
+        this.virtualNetworkRules = virtualNetworkRules;
+        return this;
     }
 
 }

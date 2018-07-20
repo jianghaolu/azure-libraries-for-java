@@ -8,6 +8,7 @@ package com.microsoft.azure.management.containerservice.implementation;
 import com.microsoft.azure.PagedList;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.containerservice.KubernetesCluster;
+import com.microsoft.azure.management.containerservice.KubernetesClusterAccessProfileRole;
 import com.microsoft.azure.management.containerservice.KubernetesClusters;
 import com.microsoft.azure.management.containerservice.OrchestratorVersionProfile;
 import com.microsoft.azure.management.resources.ResourceGroup;
@@ -150,6 +151,58 @@ public class KubernetesClustersImpl extends
                 @Override
                 public Set<String> call(TreeSet<String> kubernetesVersions) {
                     return Collections.unmodifiableSet(kubernetesVersions);
+                }
+            });
+    }
+
+    @Override
+    public byte[] getAdminKubeConfigContent(String resourceGroupName, String kubernetesClusterName) {
+        ManagedClusterAccessProfileInner profileInner = this.manager().inner().managedClusters().getAccessProfile(resourceGroupName, kubernetesClusterName, KubernetesClusterAccessProfileRole.ADMIN.toString());
+        if (profileInner == null) {
+            return new byte[0];
+        } else {
+            return profileInner.kubeConfig();
+        }
+    }
+
+    @Override
+    public Observable<byte[]> getAdminKubeConfigContentAsync(String resourceGroupName, String kubernetesClusterName) {
+        return this.manager().inner().managedClusters()
+            .getAccessProfileAsync(resourceGroupName, kubernetesClusterName, KubernetesClusterAccessProfileRole.ADMIN.toString())
+            .map(new Func1<ManagedClusterAccessProfileInner, byte[]>() {
+                @Override
+                public byte[] call(ManagedClusterAccessProfileInner profileInner) {
+                    if (profileInner == null) {
+                        return new byte[0];
+                    } else {
+                        return profileInner.kubeConfig();
+                    }
+                }
+            });
+    }
+
+    @Override
+    public byte[] getUserKubeConfigContent(String resourceGroupName, String kubernetesClusterName) {
+        ManagedClusterAccessProfileInner profileInner = this.manager().inner().managedClusters().getAccessProfile(resourceGroupName, kubernetesClusterName, KubernetesClusterAccessProfileRole.USER.toString());
+        if (profileInner == null) {
+            return new byte[0];
+        } else {
+            return profileInner.kubeConfig();
+        }
+    }
+
+    @Override
+    public Observable<byte[]> getUserKubeConfigContentAsync(String resourceGroupName, String kubernetesClusterName) {
+        return this.manager().inner().managedClusters()
+            .getAccessProfileAsync(resourceGroupName, kubernetesClusterName, KubernetesClusterAccessProfileRole.USER.toString())
+            .map(new Func1<ManagedClusterAccessProfileInner, byte[]>() {
+                @Override
+                public byte[] call(ManagedClusterAccessProfileInner profileInner) {
+                    if (profileInner == null) {
+                        return new byte[0];
+                    } else {
+                        return profileInner.kubeConfig();
+                    }
                 }
             });
     }

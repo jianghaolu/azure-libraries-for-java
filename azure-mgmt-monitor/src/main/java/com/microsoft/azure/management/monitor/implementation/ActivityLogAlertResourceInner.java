@@ -36,7 +36,7 @@ public class ActivityLogAlertResourceInner extends Resource {
     private Boolean enabled;
 
     /**
-     * The conditon that will cause this alert to activate.
+     * The condition that will cause this alert to activate.
      */
     @JsonProperty(value = "properties.condition", required = true)
     private ActivityLogAlertAllOfCondition condition;

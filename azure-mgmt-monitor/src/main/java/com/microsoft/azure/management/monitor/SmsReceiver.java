@@ -34,7 +34,8 @@ public class SmsReceiver {
     private String phoneNumber;
 
     /**
-     * Possible values include: 'NotSpecified', 'Enabled', 'Disabled'.
+     * The status of the receiver. Possible values include: 'NotSpecified',
+     * 'Enabled', 'Disabled'.
      */
     @JsonProperty(value = "status", access = JsonProperty.Access.WRITE_ONLY)
     private ReceiverStatus status;

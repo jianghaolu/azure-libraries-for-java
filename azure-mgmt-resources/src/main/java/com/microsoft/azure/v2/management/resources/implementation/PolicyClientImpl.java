@@ -43,23 +43,7 @@ public class PolicyClientImpl extends AzureServiceClient {
         return this;
     }
 
-    /**
-     * The API version to use for the operation.
-     */
-    private String apiVersion;
-
-    /**
-     * Gets The API version to use for the operation.
-     *
-     * @return the apiVersion value.
-     */
-    public String apiVersion() {
-        return this.apiVersion;
-    }
-
-    /**
-     * Gets or sets the preferred language for the response.
-     */
+    /** Gets or sets the preferred language for the response. */
     private String acceptLanguage;
 
     /**
@@ -147,6 +131,19 @@ public class PolicyClientImpl extends AzureServiceClient {
     }
 
     /**
+     * The PolicySetDefinitionsInner object to access its operations.
+     */
+    private PolicySetDefinitionsInner policySetDefinitions;
+
+    /**
+     * Gets the PolicySetDefinitionsInner object to access its operations.
+     * @return the PolicySetDefinitionsInner object.
+     */
+    public PolicySetDefinitionsInner policySetDefinitions() {
+        return this.policySetDefinitions;
+    }
+
+    /**
      * The PolicyDefinitionsInner object to access its operations.
      */
     private PolicyDefinitionsInner policyDefinitions;
@@ -188,19 +185,23 @@ public class PolicyClientImpl extends AzureServiceClient {
         this(httpPipeline, null);
     }
 
-    /**
-     * Initializes an instance of PolicyClient client.
-     *
-     * @param httpPipeline The HTTP pipeline to send requests through.
-     * @param azureEnvironment The environment that requests will target.
-     */
-    public PolicyClientImpl(HttpPipeline httpPipeline, AzureEnvironment azureEnvironment) {
-        super(httpPipeline, azureEnvironment);
-        this.apiVersion = "2016-04-01";
+    protected void initialize() {
         this.acceptLanguage = "en-US";
         this.longRunningOperationRetryTimeout = 30;
         this.generateClientRequestId = true;
-        this.policyAssignments = new PolicyAssignmentsInner(this);
-        this.policyDefinitions = new PolicyDefinitionsInner(this);
+        this.policyAssignments = new PolicyAssignmentsInner(restClient().retrofit(), this);
+        this.policySetDefinitions = new PolicySetDefinitionsInner(restClient().retrofit(), this);
+        this.policyDefinitions = new PolicyDefinitionsInner(restClient().retrofit(), this);
+        this.azureClient = new AzureClient(this);
+    }
+
+    /**
+     * Gets the User-Agent header for the client.
+     *
+     * @return the user agent string.
+     */
+    @Override
+    public String userAgent() {
+        return String.format("%s (%s)", super.userAgent(), "PolicyClient");
     }
 }

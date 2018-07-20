@@ -13,6 +13,8 @@ import com.microsoft.azure.AzureServiceClient;
 import com.microsoft.azure.management.datalake.store.Accounts;
 import com.microsoft.azure.management.datalake.store.DataLakeStoreAccountManagementClient;
 import com.microsoft.azure.management.datalake.store.FirewallRules;
+import com.microsoft.azure.management.datalake.store.Locations;
+import com.microsoft.azure.management.datalake.store.Operations;
 import com.microsoft.azure.management.datalake.store.TrustedIdProviders;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
 import com.microsoft.rest.RestClient;
@@ -137,6 +139,19 @@ public class DataLakeStoreAccountManagementClientImpl extends AzureServiceClient
     }
 
     /**
+     * The Accounts object to access its operations.
+     */
+    private Accounts accounts;
+
+    /**
+     * Gets the Accounts object to access its operations.
+     * @return the Accounts object.
+     */
+    public Accounts accounts() {
+        return this.accounts;
+    }
+
+    /**
      * The FirewallRules object to access its operations.
      */
     private FirewallRules firewallRules;
@@ -163,16 +178,29 @@ public class DataLakeStoreAccountManagementClientImpl extends AzureServiceClient
     }
 
     /**
-     * The Accounts object to access its operations.
+     * The Operations object to access its operations.
      */
-    private Accounts accounts;
+    private Operations operations;
 
     /**
-     * Gets the Accounts object to access its operations.
-     * @return the Accounts object.
+     * Gets the Operations object to access its operations.
+     * @return the Operations object.
      */
-    public Accounts accounts() {
-        return this.accounts;
+    public Operations operations() {
+        return this.operations;
+    }
+
+    /**
+     * The Locations object to access its operations.
+     */
+    private Locations locations;
+
+    /**
+     * Gets the Locations object to access its operations.
+     * @return the Locations object.
+     */
+    public Locations locations() {
+        return this.locations;
     }
 
     /**
@@ -210,9 +238,11 @@ public class DataLakeStoreAccountManagementClientImpl extends AzureServiceClient
         this.acceptLanguage = "en-US";
         this.longRunningOperationRetryTimeout = 30;
         this.generateClientRequestId = true;
+        this.accounts = new AccountsImpl(restClient().retrofit(), this);
         this.firewallRules = new FirewallRulesImpl(restClient().retrofit(), this);
         this.trustedIdProviders = new TrustedIdProvidersImpl(restClient().retrofit(), this);
-        this.accounts = new AccountsImpl(restClient().retrofit(), this);
+        this.operations = new OperationsImpl(restClient().retrofit(), this);
+        this.locations = new LocationsImpl(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
     }
 

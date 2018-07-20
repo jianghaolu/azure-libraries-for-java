@@ -24,6 +24,9 @@ import com.microsoft.azure.management.batch.Application;
 import com.microsoft.azure.management.batch.ApplicationPackage;
 import com.microsoft.azure.management.batch.BatchAccount;
 import com.microsoft.azure.management.batch.BatchAccountKeys;
+import com.microsoft.azure.management.batchai.AzureFileShareReference;
+import com.microsoft.azure.management.batchai.BatchAICluster;
+import com.microsoft.azure.management.batchai.BatchAIJob;
 import com.microsoft.azure.management.compute.AvailabilitySet;
 import com.microsoft.azure.management.compute.DataDisk;
 import com.microsoft.azure.management.compute.ImageDataDisk;
@@ -43,6 +46,8 @@ import com.microsoft.azure.management.containerservice.ContainerService;
 import com.microsoft.azure.management.containerservice.ContainerServiceOrchestratorTypes;
 import com.microsoft.azure.management.containerservice.KubernetesCluster;
 import com.microsoft.azure.management.cosmosdb.CosmosDBAccount;
+import com.microsoft.azure.management.cosmosdb.DatabaseAccountListKeysResult;
+import com.microsoft.azure.management.cosmosdb.DatabaseAccountListReadOnlyKeysResult;
 import com.microsoft.azure.management.dns.ARecordSet;
 import com.microsoft.azure.management.dns.AaaaRecordSet;
 import com.microsoft.azure.management.dns.CNameRecordSet;
@@ -57,6 +62,12 @@ import com.microsoft.azure.management.dns.SrvRecord;
 import com.microsoft.azure.management.dns.SrvRecordSet;
 import com.microsoft.azure.management.dns.TxtRecord;
 import com.microsoft.azure.management.dns.TxtRecordSet;
+import com.microsoft.azure.management.eventhub.EventHubDisasterRecoveryPairing;
+import com.microsoft.azure.management.eventhub.EventHubNamespace;
+import com.microsoft.azure.management.eventhub.EventHub;
+import com.microsoft.azure.management.eventhub.DisasterRecoveryPairingAuthorizationRule;
+import com.microsoft.azure.management.eventhub.DisasterRecoveryPairingAuthorizationKey;
+import com.microsoft.azure.management.eventhub.EventHubConsumerGroup;
 import com.microsoft.azure.management.graphrbac.ActiveDirectoryApplication;
 import com.microsoft.azure.management.graphrbac.ActiveDirectoryGroup;
 import com.microsoft.azure.management.graphrbac.ActiveDirectoryObject;
@@ -64,10 +75,14 @@ import com.microsoft.azure.management.graphrbac.ActiveDirectoryUser;
 import com.microsoft.azure.management.graphrbac.RoleAssignment;
 import com.microsoft.azure.management.graphrbac.RoleDefinition;
 import com.microsoft.azure.management.graphrbac.ServicePrincipal;
-import com.microsoft.azure.management.graphrbac.implementation.PermissionInner;
+import com.microsoft.azure.management.graphrbac.Permission;
 import com.microsoft.azure.management.keyvault.AccessPolicy;
 import com.microsoft.azure.management.keyvault.Vault;
 import com.microsoft.azure.management.locks.ManagementLock;
+import com.microsoft.azure.management.monitor.DiagnosticSetting;
+import com.microsoft.azure.management.monitor.LogSettings;
+import com.microsoft.azure.management.monitor.MetricSettings;
+import com.microsoft.azure.management.msi.Identity;
 import com.microsoft.azure.management.network.ApplicationGateway;
 import com.microsoft.azure.management.network.ApplicationGatewayBackend;
 import com.microsoft.azure.management.network.ApplicationGatewayBackendAddress;
@@ -105,6 +120,7 @@ import com.microsoft.azure.management.network.PublicIPAddress;
 import com.microsoft.azure.management.network.RouteTable;
 import com.microsoft.azure.management.network.SecurityGroupNetworkInterface;
 import com.microsoft.azure.management.network.SecurityGroupView;
+import com.microsoft.azure.management.network.ServiceEndpointType;
 import com.microsoft.azure.management.network.Subnet;
 import com.microsoft.azure.management.network.Topology;
 import com.microsoft.azure.management.network.TopologyAssociation;
@@ -115,6 +131,8 @@ import com.microsoft.azure.management.redis.RedisAccessKeys;
 import com.microsoft.azure.management.redis.RedisCache;
 import com.microsoft.azure.management.redis.RedisCachePremium;
 import com.microsoft.azure.management.redis.ScheduleEntry;
+import com.microsoft.azure.management.resources.ResourceGroup;
+import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.search.AdminKeys;
 import com.microsoft.azure.management.search.QueryKey;
@@ -130,12 +148,22 @@ import com.microsoft.azure.management.servicebus.Topic;
 import com.microsoft.azure.management.servicebus.TopicAuthorizationRule;
 import com.microsoft.azure.management.sql.ElasticPoolActivity;
 import com.microsoft.azure.management.sql.ElasticPoolDatabaseActivity;
+import com.microsoft.azure.management.sql.PartnerInfo;
 import com.microsoft.azure.management.sql.SqlDatabase;
+import com.microsoft.azure.management.sql.SqlDatabaseMetric;
+import com.microsoft.azure.management.sql.SqlDatabaseMetricValue;
+import com.microsoft.azure.management.sql.SqlDatabaseUsageMetric;
 import com.microsoft.azure.management.sql.SqlElasticPool;
+import com.microsoft.azure.management.sql.SqlFailoverGroup;
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlServer;
+import com.microsoft.azure.management.sql.SqlServerKey;
+import com.microsoft.azure.management.sql.SqlSubscriptionUsageMetric;
+import com.microsoft.azure.management.sql.SqlVirtualNetworkRule;
 import com.microsoft.azure.management.storage.StorageAccount;
+import com.microsoft.azure.management.storage.StorageAccountEncryptionStatus;
 import com.microsoft.azure.management.storage.StorageAccountKey;
+import com.microsoft.azure.management.storage.StorageService;
 import com.microsoft.azure.management.trafficmanager.TrafficManagerAzureEndpoint;
 import com.microsoft.azure.management.trafficmanager.TrafficManagerExternalEndpoint;
 import com.microsoft.azure.management.trafficmanager.TrafficManagerNestedProfileEndpoint;
@@ -165,6 +193,37 @@ import java.util.concurrent.TimeUnit;
  */
 
 public final class Utils {
+    /**
+     * Print resource group info.
+     *
+     * @param resource a resource group
+     */
+    public static void print(ResourceGroup resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("Resource Group: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tRegion: ").append(resource.region())
+                .append("\n\tTags: ").append(resource.tags());
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print User Assigned MSI info.
+     *
+     * @param resource a User Assigned MSI
+     */
+    public static void print(Identity resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("Resource Group: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tRegion: ").append(resource.region())
+                .append("\n\tTags: ").append(resource.tags())
+                .append("\n\tService Principal Id: ").append(resource.principalId())
+                .append("\n\tClient Id: ").append(resource.clientId())
+                .append("\n\tTenant Id: ").append(resource.tenantId())
+                .append("\n\tClient Secret Url: ").append(resource.clientSecretUrl());
+        System.out.println(info.toString());
+    }
 
     /**
      * Print virtual machine info.
@@ -351,6 +410,17 @@ public final class Utils {
             if (routeTable != null) {
                 info.append("\n\tRoute table ID: ").append(routeTable.id());
             }
+
+            // Output services with access
+            Map<ServiceEndpointType, List<Region>> services = subnet.servicesWithAccess();
+            if (services.size() > 0) {
+                info.append("\n\tServices with access");
+                for (Map.Entry<ServiceEndpointType, List<Region>> service : services.entrySet()) {
+                    info.append("\n\t\tService: ")
+                            .append(service.getKey())
+                            .append(" Regions: " + service.getValue() + "");
+                }
+            }
         }
 
         // Output peerings
@@ -470,7 +540,6 @@ public final class Utils {
         System.out.println(info.toString());
     }
 
-
     /**
      * Print storage account.
      *
@@ -479,6 +548,46 @@ public final class Utils {
     public static void print(StorageAccount storageAccount) {
         System.out.println(storageAccount.name()
                 + " created @ " + storageAccount.creationTime());
+
+        StringBuilder info = new StringBuilder().append("Storage Account: ").append(storageAccount.id())
+                .append("Name: ").append(storageAccount.name())
+                .append("\n\tResource group: ").append(storageAccount.resourceGroupName())
+                .append("\n\tRegion: ").append(storageAccount.region())
+                .append("\n\tSKU: ").append(storageAccount.skuType().name().toString())
+                .append("\n\tAccessTier: ").append(storageAccount.accessTier())
+                .append("\n\tKind: ").append(storageAccount.kind());
+
+        info.append("\n\tNetwork Rule Configuration: ")
+                .append("\n\t\tAllow reading logs from any network: ").append(storageAccount.canReadLogEntriesFromAnyNetwork())
+                .append("\n\t\tAllow reading metrics from any network: ").append(storageAccount.canReadMetricsFromAnyNetwork())
+                .append("\n\t\tAllow access from all azure services: ").append(storageAccount.canAccessFromAzureServices());
+
+        if (storageAccount.networkSubnetsWithAccess().size() > 0) {
+            info.append("\n\t\tNetwork subnets with access: ");
+            for (String subnetId : storageAccount.networkSubnetsWithAccess()) {
+                info.append("\n\t\t\t").append(subnetId);
+            }
+        }
+        if (storageAccount.ipAddressesWithAccess().size() > 0) {
+            info.append("\n\t\tIP addresses with access: ");
+            for (String ipAddress : storageAccount.ipAddressesWithAccess()) {
+                info.append("\n\t\t\t").append(ipAddress);
+            }
+        }
+        if (storageAccount.ipAddressRangesWithAccess().size() > 0) {
+            info.append("\n\t\tIP address-ranges with access: ");
+            for (String ipAddressRange : storageAccount.ipAddressRangesWithAccess()) {
+                info.append("\n\t\t\t").append(ipAddressRange);
+            }
+        }
+        info.append("\n\t\tTraffic allowed from only HTTPS: ").append(storageAccount.inner().enableHttpsTrafficOnly());
+
+        info.append("\n\tEncryption status: ");
+        for (Map.Entry<StorageService, StorageAccountEncryptionStatus> eStatus : storageAccount.encryptionStatuses().entrySet()) {
+            info.append("\n\t\t").append(eStatus.getValue().storageService()).append(": ").append(eStatus.getValue().isEnabled() ? "Enabled" : "Disabled");
+        }
+
+        System.out.println(info.toString());
     }
 
     /**
@@ -1269,9 +1378,11 @@ public final class Utils {
         String jdkPath = System.getProperty("java.home");
         if (jdkPath != null && !jdkPath.isEmpty()) {
             jdkPath = jdkPath.concat("\\bin");
-        }
-        if (new File(jdkPath).isDirectory()) {
-            command = String.format("%s%s%s", jdkPath, File.separator, command);
+            if (new File(jdkPath).isDirectory()) {
+                command = String.format("%s%s%s", jdkPath, File.separator, command);
+            }
+        } else {
+            return;
         }
 
         // Create Pfx file
@@ -1408,6 +1519,126 @@ public final class Utils {
                 .append("\n\tSqlServer Name: ").append(firewallRule.sqlServerName())
                 .append("\n\tStart IP Address of the firewall rule: ").append(firewallRule.startIPAddress())
                 .append("\n\tEnd IP Address of the firewall rule: ").append(firewallRule.endIPAddress());
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed virtual network rule.
+     * @param virtualNetworkRule virtual network rule to be printed.
+     */
+    public static void print(SqlVirtualNetworkRule virtualNetworkRule) {
+        StringBuilder builder = new StringBuilder().append("SQL virtual network rule: ").append(virtualNetworkRule.id())
+            .append("Name: ").append(virtualNetworkRule.name())
+            .append("\n\tResource group: ").append(virtualNetworkRule.resourceGroupName())
+            .append("\n\tSqlServer Name: ").append(virtualNetworkRule.sqlServerName())
+            .append("\n\tSubnet ID: ").append(virtualNetworkRule.subnetId())
+            .append("\n\tState: ").append(virtualNetworkRule.state());
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed SQL subscription usage metric.
+     * @param subscriptionUsageMetric metric to be printed.
+     */
+    public static void print(SqlSubscriptionUsageMetric subscriptionUsageMetric) {
+        StringBuilder builder = new StringBuilder().append("SQL Subscription Usage Metric: ").append(subscriptionUsageMetric.id())
+            .append("Name: ").append(subscriptionUsageMetric.name())
+            .append("\n\tDisplay Name: ").append(subscriptionUsageMetric.displayName())
+            .append("\n\tCurrent Value: ").append(subscriptionUsageMetric.currentValue())
+            .append("\n\tLimit: ").append(subscriptionUsageMetric.limit())
+            .append("\n\tUnit: ").append(subscriptionUsageMetric.unit())
+            .append("\n\tType: ").append(subscriptionUsageMetric.type());
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed SQL database usage metric.
+     * @param dbUsageMetric metric to be printed.
+     */
+    public static void print(SqlDatabaseUsageMetric dbUsageMetric) {
+        StringBuilder builder = new StringBuilder().append("SQL Database Usage Metric")
+            .append("Name: ").append(dbUsageMetric.name())
+            .append("\n\tResource Name: ").append(dbUsageMetric.resourceName())
+            .append("\n\tDisplay Name: ").append(dbUsageMetric.displayName())
+            .append("\n\tCurrent Value: ").append(dbUsageMetric.currentValue())
+            .append("\n\tLimit: ").append(dbUsageMetric.limit())
+            .append("\n\tUnit: ").append(dbUsageMetric.unit())
+            .append("\n\tNext Reset Time: ").append(dbUsageMetric.nextResetTime());
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed SQL database metric.
+     * @param dbMetric metric to be printed.
+     */
+    public static void print(SqlDatabaseMetric dbMetric) {
+        StringBuilder builder = new StringBuilder().append("SQL Database Metric")
+            .append("Name: ").append(dbMetric.name())
+            .append("\n\tStart Time: ").append(dbMetric.startTime())
+            .append("\n\tEnd Time: ").append(dbMetric.endTime())
+            .append("\n\tTime Grain: ").append(dbMetric.timeGrain())
+            .append("\n\tUnit: ").append(dbMetric.unit());
+        for (SqlDatabaseMetricValue metricValue : dbMetric.metricValues()) {
+            builder
+                .append("\n\tMetric Value: ")
+                .append("\n\t\tCount: ").append(metricValue.count())
+                .append("\n\t\tAverage: ").append(metricValue.average())
+                .append("\n\t\tMaximum: ").append(metricValue.maximum())
+                .append("\n\t\tMinimum: ").append(metricValue.minimum())
+                .append("\n\t\tTimestamp: ").append(metricValue.timestamp())
+                .append("\n\t\tTotal: ").append(metricValue.total());
+        }
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed Failover Group.
+     * @param failoverGroup the SQL Failover Group to be printed.
+     */
+    public static void print(SqlFailoverGroup failoverGroup) {
+        StringBuilder builder = new StringBuilder().append("SQL Failover Group: ").append(failoverGroup.id())
+            .append("Name: ").append(failoverGroup.name())
+            .append("\n\tResource group: ").append(failoverGroup.resourceGroupName())
+            .append("\n\tSqlServer Name: ").append(failoverGroup.sqlServerName())
+            .append("\n\tRead-write endpoint policy: ").append(failoverGroup.readWriteEndpointPolicy())
+            .append("\n\tData loss grace period: ").append(failoverGroup.readWriteEndpointDataLossGracePeriodMinutes())
+            .append("\n\tRead-only endpoint policy: ").append(failoverGroup.readOnlyEndpointPolicy())
+            .append("\n\tReplication state: ").append(failoverGroup.replicationState())
+            .append("\n\tReplication role: ").append(failoverGroup.replicationRole());
+        builder.append("\n\tPartner Servers: ");
+        for (PartnerInfo item : failoverGroup.partnerServers()) {
+            builder
+                .append("\n\t\tId: ").append(item.id())
+                .append("\n\t\tLocation: ").append(item.location())
+                .append("\n\t\tReplication role: ").append(item.replicationRole());
+        }
+        builder.append("\n\tDatabases: ");
+        for (String databaseId : failoverGroup.databases()) {
+            builder.append("\n\t\tID: ").append(databaseId);
+        }
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed SQL server key.
+     * @param serverKey virtual network rule to be printed.
+     */
+    public static void print(SqlServerKey serverKey) {
+        StringBuilder builder = new StringBuilder().append("SQL server key: ").append(serverKey.id())
+            .append("Name: ").append(serverKey.name())
+            .append("\n\tResource group: ").append(serverKey.resourceGroupName())
+            .append("\n\tSqlServer Name: ").append(serverKey.sqlServerName())
+            .append("\n\tRegion: ").append(serverKey.region() != null ? serverKey.region().name() : "")
+            .append("\n\tServer Key Type: ").append(serverKey.serverKeyType())
+            .append("\n\tServer Key URI: ").append(serverKey.uri())
+            .append("\n\tServer Key Thumbprint: ").append(serverKey.thumbprint())
+            .append("\n\tServer Key Creation Date: ").append(serverKey.creationDate() != null ? serverKey.creationDate().toString() : "");
 
         System.out.println(builder.toString());
     }
@@ -1796,6 +2027,39 @@ public final class Utils {
         }
     }
 
+    /**
+     * Uploads a file to an Azure web app.
+     * @param profile the publishing profile for the web app.
+     * @param fileName the name of the file on server
+     * @param file the local file
+     */
+    public static void uploadFileToWebAppWwwRoot(PublishingProfile profile, String fileName, InputStream file) {
+        FTPClient ftpClient = new FTPClient();
+        String[] ftpUrlSegments = profile.ftpUrl().split("/", 2);
+        String server = ftpUrlSegments[0];
+        String path = "./site/wwwroot";
+        if (fileName.contains("/")) {
+            int lastslash = fileName.lastIndexOf('/');
+            path = path + "/" + fileName.substring(0, lastslash);
+            fileName = fileName.substring(lastslash + 1);
+        }
+        try {
+            ftpClient.connect(server);
+            ftpClient.login(profile.ftpUsername(), profile.ftpPassword());
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            for (String segment : path.split("/")) {
+                if (!ftpClient.changeWorkingDirectory(segment)) {
+                    ftpClient.makeDirectory(segment);
+                    ftpClient.changeWorkingDirectory(segment);
+                }
+            }
+            ftpClient.storeFile(fileName, file);
+            ftpClient.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Utils() {
 
     }
@@ -2015,6 +2279,14 @@ public final class Utils {
                 .append("\n\tDefault consistency level: ").append(cosmosDBAccount.consistencyPolicy().defaultConsistencyLevel())
                 .append("\n\tIP range filter: ").append(cosmosDBAccount.ipRangeFilter());
 
+        DatabaseAccountListKeysResult keys = cosmosDBAccount.listKeys();
+        DatabaseAccountListReadOnlyKeysResult readOnlyKeys = cosmosDBAccount.listReadOnlyKeys();
+        builder
+            .append("\n\tPrimary Master Key: ").append(keys.primaryMasterKey())
+            .append("\n\tSecondary Master Key: ").append(keys.secondaryMasterKey())
+            .append("\n\tPrimary Read-Only Key: ").append(readOnlyKeys.primaryReadonlyMasterKey())
+            .append("\n\tSecondary Read-Only Key: ").append(readOnlyKeys.secondaryReadonlyMasterKey());
+
         for (com.microsoft.azure.management.cosmosdb.Location writeReplica : cosmosDBAccount.writableReplications()) {
             builder.append("\n\t\tWrite replication: ")
                     .append("\n\t\t\tName :").append(writeReplica.locationName());
@@ -2025,6 +2297,7 @@ public final class Utils {
             builder.append("\n\t\tRead replication: ")
                     .append("\n\t\t\tName :").append(readReplica.locationName());
         }
+
     }
 
     /**
@@ -2056,9 +2329,9 @@ public final class Utils {
                 .append("\n\tDescription: ").append(role.description())
                 .append("\n\tType: ").append(role.type());
 
-        Set<PermissionInner> permissions = role.permissions();
+        Set<Permission> permissions = role.permissions();
         builder.append("\n\tPermissions: ").append(permissions.size());
-        for (PermissionInner permission : permissions) {
+        for (Permission permission : permissions) {
             builder.append("\n\t\tPermission Actions: " + permission.actions().size());
             for (String action : permission.actions()) {
                 builder.append("\n\t\t\tName :").append(action);
@@ -2209,7 +2482,10 @@ public final class Utils {
      */
     public static void print(Topology resource) {
         StringBuilder sb = new StringBuilder().append("Topology: ").append(resource.id())
-                .append("\n\tResource group: ").append(resource.resourceGroupName())
+                .append("\n\tTopology parameters: ")
+                .append("\n\t\tResource group: ").append(resource.topologyParameters().targetResourceGroupName())
+                .append("\n\t\tVirtual network: ").append(resource.topologyParameters().targetVirtualNetwork() == null ? "" : resource.topologyParameters().targetVirtualNetwork().id())
+                .append("\n\t\tSubnet id: ").append(resource.topologyParameters().targetSubnet() == null ? "" : resource.topologyParameters().targetSubnet().id())
                 .append("\n\tCreated time: ").append(resource.createdTime())
                 .append("\n\tLast modified time: ").append(resource.lastModifiedTime());
         for (TopologyResource tr : resource.resources().values()) {
@@ -2342,7 +2618,8 @@ public final class Utils {
         if (resource.volumes() != null) {
             info.append("\n\tVolume mapping: ");
             for (Map.Entry<String, Volume> entry: resource.volumes().entrySet()) {
-                info.append("\n\t\tName: ").append(entry.getKey()).append(" -> ").append(entry.getValue().azureFile().shareName());
+                info.append("\n\t\tName: ").append(entry.getKey()).append(" -> ")
+                    .append(entry.getValue().azureFile() != null ? entry.getValue().azureFile().shareName() : "empty direcory volume");
             }
         }
         if (resource.containers() != null) {
@@ -2378,6 +2655,247 @@ public final class Utils {
             }
         }
 
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print event hub namespace.
+     *
+     * @param resource a virtual machine
+     */
+    public static void print(EventHubNamespace resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("Eventhub Namespace: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tRegion: ").append(resource.region())
+                .append("\n\tTags: ").append(resource.tags())
+                .append("\n\tAzureInsightMetricId: ").append(resource.azureInsightMetricId())
+                .append("\n\tIsAutoScale enabled: ").append(resource.isAutoScaleEnabled())
+                .append("\n\tServiceBus endpoint: ").append(resource.serviceBusEndpoint())
+                .append("\n\tThroughPut upper limit: ").append(resource.throughputUnitsUpperLimit())
+                .append("\n\tCurrent ThroughPut: ").append(resource.currentThroughputUnits())
+                .append("\n\tCreated time: ").append(resource.createdAt())
+                .append("\n\tUpdated time: ").append(resource.updatedAt());
+
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print event hub.
+     *
+     * @param resource event hub
+     */
+    public static void print(EventHub resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("Eventhub: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tNamespace resource group: ").append(resource.namespaceResourceGroupName())
+                .append("\n\tNamespace: ").append(resource.namespaceName())
+                .append("\n\tIs data capture enabled: ").append(resource.isDataCaptureEnabled())
+                .append("\n\tPartition ids: ").append(resource.partitionIds());
+        if (resource.isDataCaptureEnabled()) {
+            info.append("\n\t\t\tData capture window size in MB: ").append(resource.dataCaptureWindowSizeInMB());
+            info.append("\n\t\t\tData capture window size in seconds: ").append(resource.dataCaptureWindowSizeInSeconds());
+            if (resource.captureDestination() != null) {
+                info.append("\n\t\t\tData capture storage account: ").append(resource.captureDestination().storageAccountResourceId());
+                info.append("\n\t\t\tData capture storage container: ").append(resource.captureDestination().blobContainer());
+            }
+        }
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print event hub namespace recovery pairing.
+     *
+     * @param resource event hub namespace disaster recovery pairing
+     */
+    public static void print(EventHubDisasterRecoveryPairing resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("DisasterRecoveryPairing: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tPrimary namespace resource group name: ").append(resource.primaryNamespaceResourceGroupName())
+                .append("\n\tPrimary namespace name: ").append(resource.primaryNamespaceName())
+                .append("\n\tSecondary namespace: ").append(resource.secondaryNamespaceId())
+                .append("\n\tNamespace role: ").append(resource.namespaceRole());
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print event hub namespace recovery pairing auth rules.
+     *
+     * @param resource event hub namespace disaster recovery pairing auth rule
+     */
+    public static void print(DisasterRecoveryPairingAuthorizationRule resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("DisasterRecoveryPairing auth rule: ").append(resource.name());
+        List<String> rightsStr = new ArrayList<>();
+        for (com.microsoft.azure.management.eventhub.AccessRights rights : resource.rights()) {
+            rightsStr.add(rights.toString());
+        }
+        info.append("\n\tRights: ").append(rightsStr);
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print event hub namespace recovery pairing auth rule key.
+     *
+     * @param resource event hub namespace disaster recovery pairing auth rule key
+     */
+    public static void print(DisasterRecoveryPairingAuthorizationKey resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("DisasterRecoveryPairing auth key: ")
+                .append("\n\t Alias primary connection string: ").append(resource.aliasPrimaryConnectionString())
+                .append("\n\t Alias secondary connection string: ").append(resource.aliasSecondaryConnectionString())
+                .append("\n\t Primary key: ").append(resource.primaryKey())
+                .append("\n\t Secondary key: ").append(resource.secondaryKey())
+                .append("\n\t Primary connection string: ").append(resource.primaryConnectionString())
+                .append("\n\t Secondary connection string: ").append(resource.secondaryConnectionString());
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print event hub consumer group.
+     *
+     * @param resource event hub consumer group
+     */
+    public static void print(EventHubConsumerGroup resource) {
+        StringBuilder info = new StringBuilder();
+        info.append("Event hub consumer group: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tNamespace resource group: ").append(resource.namespaceResourceGroupName())
+                .append("\n\tNamespace: ").append(resource.namespaceName())
+                .append("\n\tEvent hub name: ").append(resource.eventHubName())
+                .append("\n\tUser metadata: ").append(resource.userMetadata());
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print Batch AI Cluster.
+     *
+     * @param resource batch ai cluster
+     */
+    public static void print(BatchAICluster resource) {
+        StringBuilder info = new StringBuilder("Batch AI cluster: ")
+                .append("\n\tId: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tResource group: ").append(resource.workspace().resourceGroupName())
+                .append("\n\tRegion: ").append(resource.workspace().regionName())
+                .append("\n\tVM Size: ").append(resource.vmSize())
+                .append("\n\tVM Priority: ").append(resource.vmPriority())
+                .append("\n\tSubnet: ").append(resource.subnet())
+                .append("\n\tAllocation state: ").append(resource.allocationState())
+                .append("\n\tAllocation state transition time: ").append(resource.allocationStateTransitionTime())
+                .append("\n\tCreation time: ").append(resource.creationTime())
+                .append("\n\tCurrent node count: ").append(resource.currentNodeCount())
+                .append("\n\tAllocation state transition time: ").append(resource.allocationStateTransitionTime())
+                .append("\n\tAllocation state transition time: ").append(resource.allocationStateTransitionTime());
+        if (resource.scaleSettings().autoScale() != null) {
+            info.append("\n\tAuto scale settings: ")
+                    .append("\n\t\tInitial node count: ").append(resource.scaleSettings().autoScale().initialNodeCount())
+                    .append("\n\t\tMinimum node count: ").append(resource.scaleSettings().autoScale().minimumNodeCount())
+                    .append("\n\t\tMaximum node count: ").append(resource.scaleSettings().autoScale().maximumNodeCount());
+        }
+        if (resource.scaleSettings().manual() != null) {
+            info.append("\n\tManual scale settings: ")
+                    .append("\n\t\tTarget node count: ").append(resource.scaleSettings().manual().targetNodeCount())
+                    .append("\n\t\tDeallocation option: ")
+                    .append(resource.scaleSettings().manual().nodeDeallocationOption());
+        }
+        if (resource.nodeStateCounts() != null) {
+            info.append("\n\tNode state counts: ")
+                    .append("\n\t\tRunning nodes count: ").append(resource.nodeStateCounts().runningNodeCount())
+                    .append("\n\t\tIdle nodes count: ").append(resource.nodeStateCounts().idleNodeCount())
+                    .append("\n\t\tPreparing nodes count: ").append(resource.nodeStateCounts().preparingNodeCount())
+                    .append("\n\t\tLeaving nodes count: ").append(resource.nodeStateCounts().leavingNodeCount())
+                    .append("\n\t\tPreparing nodes count: ").append(resource.nodeStateCounts().preparingNodeCount());
+        }
+        if (resource.virtualMachineConfiguration() != null && resource.virtualMachineConfiguration().imageReference() != null) {
+            info.append("\n\tVirtual machine configuration: ")
+                    .append("\n\t\tPublisher: ").append(resource.virtualMachineConfiguration().imageReference().publisher())
+                    .append("\n\t\tOffer: ").append(resource.virtualMachineConfiguration().imageReference().offer())
+                    .append("\n\t\tSku: ").append(resource.virtualMachineConfiguration().imageReference().sku())
+                    .append("\n\t\tVersion: ").append(resource.virtualMachineConfiguration().imageReference().version());
+        }
+        if (resource.nodeSetup() != null && resource.nodeSetup().setupTask() != null) {
+            info.append("\n\tSetup task: ")
+                    .append("\n\t\tCommand line: ").append(resource.nodeSetup().setupTask().commandLine())
+                    .append("\n\t\tStdout/err Path Prefix: ").append(resource.nodeSetup().setupTask().stdOutErrPathPrefix());
+        }
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print Batch AI Job.
+     *
+     * @param resource batch ai job
+     */
+    public static void print(BatchAIJob resource) {
+        StringBuilder info = new StringBuilder("Batch AI job: ")
+                .append("\n\tId: ").append(resource.id())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tCluster Id: ").append(resource.cluster())
+                .append("\n\tCreation time: ").append(resource.creationTime())
+                .append("\n\tNode count: ").append(resource.nodeCount())
+                .append("\n\tPriority: ").append(resource.schedulingPriority())
+                .append("\n\tExecution state: ").append(resource.executionState())
+                .append("\n\tExecution state transition time: ").append(resource.executionStateTransitionTime())
+                .append("\n\tTool type: ").append(resource.toolType())
+                .append("\n\tExperiment name: ").append(resource.experiment().name());
+        if (resource.mountVolumes() != null) {
+            info.append("\n\tMount volumes:");
+            if (resource.mountVolumes().azureFileShares() != null) {
+                info.append("\n\t\tAzure fileshares:");
+                for (AzureFileShareReference share : resource.mountVolumes().azureFileShares()) {
+                    info.append("\n\t\t\tAccount name:").append(share.accountName())
+                            .append("\n\t\t\tFile Url:").append(share.azureFileUrl())
+                            .append("\n\t\t\tDirectory mode:").append(share.directoryMode())
+                            .append("\n\t\t\tFile mode:").append(share.fileMode())
+                            .append("\n\t\t\tRelative mount path:").append(share.relativeMountPath());
+                }
+            }
+        }
+        System.out.println(info.toString());
+    }
+
+    /**
+     * Print Diagnostic Setting.
+     *
+     * @param resource Diagnostic Setting instance
+     */
+    public static void print(DiagnosticSetting resource) {
+        StringBuilder info = new StringBuilder("Diagnostic Setting: ")
+                .append("\n\tId: ").append(resource.id())
+                .append("\n\tAssociated resource Id: ").append(resource.resourceId())
+                .append("\n\tName: ").append(resource.name())
+                .append("\n\tStorage Account Id: ").append(resource.storageAccountId())
+                .append("\n\tEventHub Namespace Autorization Rule Id: ").append(resource.eventHubAuthorizationRuleId())
+                .append("\n\tEventHub name: ").append(resource.eventHubName())
+                .append("\n\tLog Analytics workspace Id: ").append(resource.workspaceId());
+        if (resource.logs() != null && !resource.logs().isEmpty()) {
+            info.append("\n\tLog Settings: ");
+            for (LogSettings ls : resource.logs()) {
+                info.append("\n\t\tCategory: ").append(ls.category());
+                info.append("\n\t\tRetention policy: ");
+                if (ls.retentionPolicy() != null) {
+                    info.append(ls.retentionPolicy().days() + " days");
+                } else {
+                    info.append("NONE");
+                }
+            }
+        }
+        if (resource.metrics() != null && !resource.metrics().isEmpty()) {
+            info.append("\n\tMetric Settings: ");
+            for (MetricSettings ls : resource.metrics()) {
+                info.append("\n\t\tCategory: ").append(ls.category());
+                info.append("\n\t\tTimegrain: ").append(ls.timeGrain());
+                info.append("\n\t\tRetention policy: ");
+                if (ls.retentionPolicy() != null) {
+                    info.append(ls.retentionPolicy().days() + " days");
+                } else {
+                    info.append("NONE");
+                }
+            }
+        }
         System.out.println(info.toString());
     }
 

@@ -8,10 +8,11 @@
 
 package com.microsoft.azure.management.datalake.analytics.models;
 
-import org.joda.time.DateTime;
 import java.util.UUID;
+import org.joda.time.DateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
+import com.microsoft.rest.SkipParentValidation;
 import com.microsoft.azure.Resource;
 
 /**
@@ -19,40 +20,8 @@ import com.microsoft.azure.Resource;
  * with the named Data Lake Analytics account.
  */
 @JsonFlatten
+@SkipParentValidation
 public class DataLakeAnalyticsAccountBasic extends Resource {
-    /**
-     * the provisioning status of the Data Lake Analytics account. Possible
-     * values include: 'Failed', 'Creating', 'Running', 'Succeeded',
-     * 'Patching', 'Suspending', 'Resuming', 'Deleting', 'Deleted'.
-     */
-    @JsonProperty(value = "properties.provisioningState", access = JsonProperty.Access.WRITE_ONLY)
-    private DataLakeAnalyticsAccountStatus provisioningState;
-
-    /**
-     * the state of the Data Lake Analytics account. Possible values include:
-     * 'Active', 'Suspended'.
-     */
-    @JsonProperty(value = "properties.state", access = JsonProperty.Access.WRITE_ONLY)
-    private DataLakeAnalyticsAccountState state;
-
-    /**
-     * the account creation time.
-     */
-    @JsonProperty(value = "properties.creationTime", access = JsonProperty.Access.WRITE_ONLY)
-    private DateTime creationTime;
-
-    /**
-     * the account last modified time.
-     */
-    @JsonProperty(value = "properties.lastModifiedTime", access = JsonProperty.Access.WRITE_ONLY)
-    private DateTime lastModifiedTime;
-
-    /**
-     * the full CName endpoint for this account.
-     */
-    @JsonProperty(value = "properties.endpoint", access = JsonProperty.Access.WRITE_ONLY)
-    private String endpoint;
-
     /**
      * The unique identifier associated with this Data Lake Analytics account.
      */
@@ -60,7 +29,50 @@ public class DataLakeAnalyticsAccountBasic extends Resource {
     private UUID accountId;
 
     /**
-     * Get the provisioningState value.
+     * The provisioning status of the Data Lake Analytics account. Possible
+     * values include: 'Failed', 'Creating', 'Running', 'Succeeded',
+     * 'Patching', 'Suspending', 'Resuming', 'Deleting', 'Deleted',
+     * 'Undeleting', 'Canceled'.
+     */
+    @JsonProperty(value = "properties.provisioningState", access = JsonProperty.Access.WRITE_ONLY)
+    private DataLakeAnalyticsAccountStatus provisioningState;
+
+    /**
+     * The state of the Data Lake Analytics account. Possible values include:
+     * 'Active', 'Suspended'.
+     */
+    @JsonProperty(value = "properties.state", access = JsonProperty.Access.WRITE_ONLY)
+    private DataLakeAnalyticsAccountState state;
+
+    /**
+     * The account creation time.
+     */
+    @JsonProperty(value = "properties.creationTime", access = JsonProperty.Access.WRITE_ONLY)
+    private DateTime creationTime;
+
+    /**
+     * The account last modified time.
+     */
+    @JsonProperty(value = "properties.lastModifiedTime", access = JsonProperty.Access.WRITE_ONLY)
+    private DateTime lastModifiedTime;
+
+    /**
+     * The full CName endpoint for this account.
+     */
+    @JsonProperty(value = "properties.endpoint", access = JsonProperty.Access.WRITE_ONLY)
+    private String endpoint;
+
+    /**
+     * Get the unique identifier associated with this Data Lake Analytics account.
+     *
+     * @return the accountId value
+     */
+    public UUID accountId() {
+        return this.accountId;
+    }
+
+    /**
+     * Get the provisioning status of the Data Lake Analytics account. Possible values include: 'Failed', 'Creating', 'Running', 'Succeeded', 'Patching', 'Suspending', 'Resuming', 'Deleting', 'Deleted', 'Undeleting', 'Canceled'.
      *
      * @return the provisioningState value
      */
@@ -69,7 +81,7 @@ public class DataLakeAnalyticsAccountBasic extends Resource {
     }
 
     /**
-     * Get the state value.
+     * Get the state of the Data Lake Analytics account. Possible values include: 'Active', 'Suspended'.
      *
      * @return the state value
      */
@@ -78,7 +90,7 @@ public class DataLakeAnalyticsAccountBasic extends Resource {
     }
 
     /**
-     * Get the creationTime value.
+     * Get the account creation time.
      *
      * @return the creationTime value
      */
@@ -87,7 +99,7 @@ public class DataLakeAnalyticsAccountBasic extends Resource {
     }
 
     /**
-     * Get the lastModifiedTime value.
+     * Get the account last modified time.
      *
      * @return the lastModifiedTime value
      */
@@ -96,21 +108,12 @@ public class DataLakeAnalyticsAccountBasic extends Resource {
     }
 
     /**
-     * Get the endpoint value.
+     * Get the full CName endpoint for this account.
      *
      * @return the endpoint value
      */
     public String endpoint() {
         return this.endpoint;
-    }
-
-    /**
-     * Get the accountId value.
-     *
-     * @return the accountId value
-     */
-    public UUID accountId() {
-        return this.accountId;
     }
 
 }

@@ -13,8 +13,8 @@ import com.microsoft.azure.management.graphrbac.ActiveDirectoryUser;
 import com.microsoft.azure.management.graphrbac.ServicePrincipal;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.ChildResource;
 import com.microsoft.azure.management.resources.fluentcore.model.Attachable;
-import com.microsoft.azure.management.resources.fluentcore.model.Settable;
 import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
+import com.microsoft.azure.management.resources.fluentcore.model.Settable;
 
 import java.util.List;
 
@@ -92,7 +92,7 @@ public interface AccessPolicy extends
              * @return the next stage of access policy definition
              */
             WithAttach<ParentT> forUser(ActiveDirectoryUser user);
-
+            
             /**
              * Specifies the Active Directory user this access policy is for.
              *
@@ -100,6 +100,23 @@ public interface AccessPolicy extends
              * @return the next stage of access policy definition
              */
             WithAttach<ParentT> forUser(String userPrincipalName);
+            
+            /**
+             * Application ID of the client making request on behalf of a principal.
+             * 
+             * @param applicationId the application ID
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> forApplicationId(String applicationId);
+            
+            /**
+             * Specifies the Azure Active Directory tenant ID that should be used for
+             * authenticating requests to the key vault.
+             * 
+             * @param tenantId the tenant ID for the key vault.
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> forTenantId(String tenantId);
 
             /**
              * Specifies the Active Directory group this access policy is for.
@@ -178,6 +195,54 @@ public interface AccessPolicy extends
              * @return the next stage of access policy definition
              */
             WithAttach<ParentT> allowSecretPermissions(List<SecretPermissions> permissions);
+
+            /**
+             * Allow all permissions for the AD identity to access certificates.
+             *
+             * @return the next stage of access policy definition
+             */
+            @Method
+            WithAttach<ParentT> allowCertificateAllPermissions();
+
+            /**
+             * Allow a list of permissions for the AD identity to access certificates.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> allowCertificatePermissions(CertificatePermissions... permissions);
+
+            /**
+             * Allow a list of permissions for the AD identity to access certificates.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> allowCertificatePermissions(List<CertificatePermissions> permissions);
+            
+            /**
+             * Allow all permissions for the Ad identity to access storage.
+             * 
+             * @return the next stage of access policy definition
+             */
+            @Method
+            WithAttach<ParentT> allowStorageAllPermissions();
+            
+            /**
+             * Allow a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> allowStoragePermissions(StoragePermissions...permissions);
+            
+            /**
+             * Allow a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> allowStoragePermissions(List<StoragePermissions> permissions);
         }
 
         /** The final stage of the access policy definition.
@@ -242,6 +307,23 @@ public interface AccessPolicy extends
              * @return the next stage of access policy definition
              */
             WithAttach<ParentT> forUser(String userPrincipalName);
+            
+            /**
+             * Application ID of the client making request on behalf of a principal.
+             * 
+             * @param applicationId the application ID
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> forApplicationId(String applicationId);
+            
+            /**
+             * Specifies the Azure Active Directory tenant ID that should be used for
+             * authenticating requests to the key vault.
+             * 
+             * @param tenantId the tenant ID for the key vault.
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> forTenantId(String tenantId);
 
             /**
              * Specifies the Active Directory group this access policy is for.
@@ -320,6 +402,30 @@ public interface AccessPolicy extends
              * @return the next stage of access policy definition
              */
             WithAttach<ParentT> allowSecretPermissions(List<SecretPermissions> permissions);
+            
+            /**
+             * Allow all permissions for the Ad identity to access storage.
+             * 
+             * @return the next stage of access policy definition
+             */
+            @Method
+            WithAttach<ParentT> allowStorageAllPermissions();
+            
+            /**
+             * Allow a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> allowStoragePermissions(StoragePermissions...permissions);
+            
+            /**
+             * Allow a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            WithAttach<ParentT> allowStoragePermissions(List<StoragePermissions> permissions);
         }
 
         /** The final stage of the access policy definition.
@@ -438,6 +544,102 @@ public interface AccessPolicy extends
              * @return the next stage of access policy update
              */
             Update disallowSecretPermissions(List<SecretPermissions> permissions);
+
+            /**
+             * Allow all permissions for the AD identity to access certificates.
+             *
+             * @return the next stage of access policy update
+             */
+            @Method
+            Update allowCertificateAllPermissions();
+
+            /**
+             * Allow a list of permissions for the AD identity to access certificates.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy update
+             */
+            Update allowCertificatePermissions(CertificatePermissions... permissions);
+
+            /**
+             * Allow a list of permissions for the AD identity to access certificates.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy update
+             */
+            Update allowCertificatePermissions(List<CertificatePermissions> permissions);
+
+            /**
+             * Revoke all permissions for the AD identity to access certificates.
+             *
+             * @return the next stage of access policy update
+             */
+            @Method
+            Update disallowCertificateAllPermissions();
+
+            /**
+             * Revoke a list of permissions for the AD identity to access certificates.
+             *
+             * @param permissions the list of permissions to revoke
+             * @return the next stage of access policy update
+             */
+            Update disallowCertificatePermissions(CertificatePermissions... permissions);
+
+            /**
+             * Revoke a list of permissions for the AD identity to access certificates.
+             *
+             * @param permissions the list of permissions to revoke
+             * @return the next stage of access policy update
+             */
+            Update disallowCertificatePermissions(List<CertificatePermissions> permissions);
+            
+            /**
+             * Allow all permissions for the Ad identity to access storage.
+             * 
+             * @return the next stage of access policy definition
+             */
+            @Method
+            Update allowStorageAllPermissions();
+            
+            /**
+             * Allow a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            Update allowStoragePermissions(StoragePermissions...permissions);
+            
+            /**
+             * Allow a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            Update allowStoragePermissions(List<StoragePermissions> permissions);
+            
+            /**
+             * Revoke all permissions for the Ad identity to access storage.
+             * 
+             * @return the next stage of access policy definition
+             */
+            @Method
+            Update disallowStorageAllPermissions();
+            
+            /**
+             * Revoke a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            Update disallowStoragePermissions(StoragePermissions...permissions);
+            
+            /**
+             * Revoke a list of permissions for the AD identity to access storage.
+             *
+             * @param permissions the list of permissions allowed
+             * @return the next stage of access policy definition
+             */
+            Update disallowStoragePermissions(List<StoragePermissions> permissions);
         }
     }
 

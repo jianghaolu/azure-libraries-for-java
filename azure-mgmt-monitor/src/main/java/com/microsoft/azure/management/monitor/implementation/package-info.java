@@ -6,6 +6,6 @@
 
 /**
  * This package contains the implementation classes for MonitorManagementClient.
- * Composite Swagger for Monitor Management Client.
+ * Monitor Management Client.
  */
 package com.microsoft.azure.management.monitor.implementation;

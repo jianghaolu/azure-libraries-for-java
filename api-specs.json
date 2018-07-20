@@ -5,17 +5,29 @@
     "package": "com.microsoft.azure.v2.management.analysisservices",
     "args": "--payload-flattening-threshold=1 --tag=package-2016-05"
   },
+  "apimanagement": {
+    "dir": "azure-mgmt-apimanagement",
+    "source": "specification/apimanagement/resource-manager/readme.md",
+    "package": "com.microsoft.azure.management.apimanagement",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-01"
+  },
   "appservice": {
     "dir": "azure-mgmt-appservice",
     "source": "specification/web/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.appservice",
-    "args": "--payload-flattening-threshold=1 --tag=package-2016-09"
+    "package": "com.microsoft.azure.management.appservice",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-02"
   },
   "arm-keyvault": {
     "dir": "azure-mgmt-keyvault",
     "source": "specification/keyvault/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.keyvault",
-    "args": "--payload-flattening-threshold=1 --tag=package-2015-06"
+    "package": "com.microsoft.azure.management.keyvault",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-02"
+  },
+  "authorization": {
+    "dir": "azure-mgmt-graph-rbac",
+    "source": "specification/authorization/resource-manager/readme.md",
+    "package": "com.microsoft.azure.management.graphrbac",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-01-01-preview"
   },
   "automation": {
     "dir": "azure-mgmt-automation",
@@ -26,14 +38,14 @@
   "batch": {
     "dir": "azure-mgmt-batch",
     "source": "specification/batch/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.batch",
-    "args": "--payload-flattening-threshold=1 --tag=package-2017-05"
+    "package": "com.microsoft.azure.management.batch",
+    "args": "--payload-flattening-threshold=1 --tag=package-2017-09"
   },
   "batchai": {
     "dir": "azure-mgmt-batchai",
     "source": "specification/batchai/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.batchai",
-    "args": "--payload-flattening-threshold=1 --tag=package-2017-09-preview"    
+    "package": "com.microsoft.azure.management.batchai",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-05"
   },
   "batchService": {
     "dir": "azure-batch",
@@ -51,8 +63,8 @@
   "cdn": {
     "dir": "azure-mgmt-cdn",
     "source": "specification/cdn/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.cdn",
-    "args": "--payload-flattening-threshold=2 --tag=package-2016-10"
+    "package": "com.microsoft.azure.management.cdn",
+    "args": "--payload-flattening-threshold=2 --tag=package-2017-10"
   },
   "cognitiveservices": {
     "dir": "azure-mgmt-cognitiveservices",
@@ -63,20 +75,20 @@
   "compute": {
     "dir": "azure-mgmt-compute",
     "source": "specification/compute/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.compute",
-    "args": "--payload-flattening-threshold=1 --tag=package-compute-2017-12"
+    "package": "com.microsoft.azure.management.compute",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-06-01"
   },
   "consumption": {
     "dir": "azure-mgmt-consumption",
     "source": "specification/consumption/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.consumption",
-    "args": "--payload-flattening-threshold=1 --tag=package-2017-11"
+    "package": "com.microsoft.azure.management.consumption",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-01"
   },
   "containerinstance": {
       "dir": "azure-mgmt-containerinstance",
       "source": "specification/containerinstance/resource-manager/readme.md",
-      "package": "com.microsoft.azure.v2.management.containerinstance",
-      "args": "--payload-flattening-threshold=1 --tag=package-2017-10-preview"
+      "package": "com.microsoft.azure.management.containerinstance",
+      "args": "--payload-flattening-threshold=1 --tag=package-2018-04"
   },
   "containerregistry": {
     "dir": "azure-mgmt-containerregistry",
@@ -86,9 +98,9 @@
   },
   "containerservice": {
     "dir": "azure-mgmt-containerservice",
-    "source": "specification/compute/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.containerservice",
-    "args": "--payload-flattening-threshold=1 --tag=package-container-service-2017-09 --title=ContainerServiceManagementClient --description=\"Container Service Client\""
+    "source": "specification/containerservices/resource-manager/readme.md",
+    "package": "com.microsoft.azure.management.containerservice",
+    "args": "--payload-flattening-threshold=1 --tag=package-2017-09 --title=ContainerServiceManagementClient --description=\"Container Service Client\""
   },
   "cosmosdb": {
     "dir": "azure-mgmt-cosmosdb",
@@ -105,29 +117,29 @@
   "datalake.analytics.account": {
     "dir": "azure-mgmt-datalake-analytics",
     "source": "specification/datalake-analytics/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.datalake.analytics",
-    "args": "--tag=package-2016-11",
+    "package": "com.microsoft.azure.management.datalake.analytics",
+    "args": "--payload-flattening-threshold=2 --tag=package-2016-11",
     "fluent": false
   },
   "datalake.analytics.catalog": {
     "dir": "azure-mgmt-datalake-analytics",
     "source": "specification/datalake-analytics/data-plane/readme.md",
-    "package": "com.microsoft.azure.v2.management.datalake.analytics",
-    "args": "--tag=package-catalog-2016-11",
+    "package": "com.microsoft.azure.management.datalake.analytics",
+    "args": "--payload-flattening-threshold=2 --tag=package-catalog-2016-11",
     "fluent": false
   },
   "datalake.analytics.job": {
     "dir": "azure-mgmt-datalake-analytics",
     "source": "specification/datalake-analytics/data-plane/readme.md",
-    "package": "com.microsoft.azure.v2.management.datalake.analytics",
-    "args": "--tag=package-job-2016-11",
+    "package": "com.microsoft.azure.management.datalake.analytics",
+    "args": "--payload-flattening-threshold=2 --tag=package-job-2017-09-preview",
     "fluent": false
   },
   "datalake.store.account": {
     "dir": "azure-mgmt-datalake-store",
     "source": "specification/datalake-store/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.datalake.store",
-    "args": "--tag=package-2016-11",
+    "package": "com.microsoft.azure.management.datalake.store",
+    "args": "--payload-flattening-threshold=2 --tag=package-2016-11",
     "fluent": false
   },
   "devtestlab": {
@@ -139,8 +151,8 @@
   "dns": {
     "dir": "azure-mgmt-dns",
     "source": "specification/dns/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.dns",
-    "args": "--payload-flattening-threshold=1 --tag=package-2016-04"
+    "package": "com.microsoft.azure.management.dns",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-03-preview"
   },
   "eventhub": {
     "dir": "azure-mgmt-eventhub",
@@ -193,20 +205,14 @@
   "monitor": {
     "dir": "azure-mgmt-monitor",
     "source": "specification/monitor/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.monitor",
-    "args": "--payload-flattening-threshold=1 --tag=package-2017-08"
-  },
-  "monitor-dataplane": {
-    "dir": "azure-mgmt-monitor",
-    "source": "specification/monitor/data-plane/readme.md",
-    "package": "com.microsoft.azure.v2.management.monitor",
-    "args": "--payload-flattening-threshold=1 --service-name=Monitor --tag=package-2016-09"
+    "package": "com.microsoft.azure.management.monitor",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-03"
   },
   "network": {
     "dir": "azure-mgmt-network",
     "source": "specification/network/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.network",
-    "args": "--payload-flattening-threshold=1 --tag=package-2017-08"
+    "package": "com.microsoft.azure.management.network",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-04"
   },
   "notificationhubs": {
     "dir": "azure-mgmt-notificationhubs",
@@ -217,7 +223,7 @@
   "policy": {
     "dir": "azure-mgmt-resources",
     "source": "specification/resources/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.resources --tag=package-policy-2016-04"
+    "package": "com.microsoft.azure.management.resources --tag=package-policy-2017-06"
   },
   "powerbi": {
     "dir": "azure-mgmt-powerbi",
@@ -246,8 +252,8 @@
   "redis": {
     "dir": "azure-mgmt-redis",
     "source": "specification/redis/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.redis",
-    "args": "--payload-flattening-threshold=1 --tag=package-2016-04"
+    "package": "com.microsoft.azure.management.redis",
+    "args": "--payload-flattening-threshold=1 --tag=package-2018-03"
   },
   "relay": {
     "dir": "azure-mgmt-relay",
@@ -258,7 +264,7 @@
   "resources": {
     "dir": "azure-mgmt-resources",
     "source": "specification/resources/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.resources --tag=package-resources-2016-09"
+    "package": "com.microsoft.azure.management.resources --tag=package-resources-2017-05"
   },
   "scheduler": {
     "dir": "azure-mgmt-scheduler",
@@ -293,8 +299,8 @@
   "sql": {
     "dir": "azure-mgmt-sql",
     "source": "specification/sql/resource-manager/readme.md",
-    "package": "com.microsoft.azure.v2.management.sql",
-    "args": "--payload-flattening-threshold=1 --tag=package-2015-05-preview"
+    "package": "com.microsoft.azure.management.sql",
+    "args": "--payload-flattening-threshold=1 --tag=package-2017-03-preview"
   },
   "storage": {
     "dir": "azure-mgmt-storage",

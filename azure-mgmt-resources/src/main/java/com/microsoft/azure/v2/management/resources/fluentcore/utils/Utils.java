@@ -79,6 +79,7 @@ public final class Utils {
         }
         return value;
     }
+
     /**
      * Creates an Odata filter string that can be used for filtering list results by tags.
      *
@@ -97,8 +98,8 @@ public final class Utils {
     }
 
     /**
-     * Gets an observable of {@link U} that emits only the root resource from a given
-     * observable of {@link Indexable}.
+     * Gets an observable of type {@code U}, where U extends {@link Indexable}, that emits only the root
+     * resource from a given observable of {@link Indexable}.
      *
      * @param stream the input observable of {@link Indexable}
      * @param <U> the specialized type of last item in the input stream

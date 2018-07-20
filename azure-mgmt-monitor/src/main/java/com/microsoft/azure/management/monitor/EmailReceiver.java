@@ -28,7 +28,8 @@ public class EmailReceiver {
     private String emailAddress;
 
     /**
-     * Possible values include: 'NotSpecified', 'Enabled', 'Disabled'.
+     * The receiver status of the e-mail. Possible values include:
+     * 'NotSpecified', 'Enabled', 'Disabled'.
      */
     @JsonProperty(value = "status", access = JsonProperty.Access.WRITE_ONLY)
     private ReceiverStatus status;

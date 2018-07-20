@@ -19,24 +19,25 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonTypeName("CreateJobProperties")
 @JsonSubTypes({
-    @JsonSubTypes.Type(name = "USql", value = CreateUSqlJobProperties.class)
+    @JsonSubTypes.Type(name = "USql", value = CreateUSqlJobProperties.class),
+    @JsonSubTypes.Type(name = "Scope", value = CreateScopeJobProperties.class)
 })
 public class CreateJobProperties {
     /**
-     * the runtime version of the Data Lake Analytics engine to use for the
+     * The runtime version of the Data Lake Analytics engine to use for the
      * specific type of job being run.
      */
     @JsonProperty(value = "runtimeVersion")
     private String runtimeVersion;
 
     /**
-     * the script to run.
+     * The script to run. Please note that the maximum script size is 3 MB.
      */
     @JsonProperty(value = "script", required = true)
     private String script;
 
     /**
-     * Get the runtimeVersion value.
+     * Get the runtime version of the Data Lake Analytics engine to use for the specific type of job being run.
      *
      * @return the runtimeVersion value
      */
@@ -45,7 +46,7 @@ public class CreateJobProperties {
     }
 
     /**
-     * Set the runtimeVersion value.
+     * Set the runtime version of the Data Lake Analytics engine to use for the specific type of job being run.
      *
      * @param runtimeVersion the runtimeVersion value to set
      * @return the CreateJobProperties object itself.
@@ -56,7 +57,7 @@ public class CreateJobProperties {
     }
 
     /**
-     * Get the script value.
+     * Get the script to run. Please note that the maximum script size is 3 MB.
      *
      * @return the script value
      */
@@ -65,7 +66,7 @@ public class CreateJobProperties {
     }
 
     /**
-     * Set the script value.
+     * Set the script to run. Please note that the maximum script size is 3 MB.
      *
      * @param script the script value to set
      * @return the CreateJobProperties object itself.

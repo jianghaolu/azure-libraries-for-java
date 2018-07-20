@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("Microsoft.Azure.Management.Insights.Models.RuleWebhookAction")
 public class RuleWebhookAction extends RuleAction {
     /**
-     * the service uri to Post the notitication when the alert activates or
+     * the service uri to Post the notification when the alert activates or
      * resolves.
      */
     @JsonProperty(value = "serviceUri")

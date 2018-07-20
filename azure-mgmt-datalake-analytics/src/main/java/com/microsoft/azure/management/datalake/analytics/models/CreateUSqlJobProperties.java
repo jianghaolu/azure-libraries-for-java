@@ -19,16 +19,16 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("USql")
 public class CreateUSqlJobProperties extends CreateJobProperties {
     /**
-     * Optionally enforces a specific compilation mode for the job during
-     * execution. If this is not specified during submission, the server will
-     * determine the optimal compilation mode. Possible values include:
-     * 'Semantic', 'Full', 'SingleBox'.
+     * The specific compilation mode for the job used during execution. If this
+     * is not specified during submission, the server will determine the
+     * optimal compilation mode. Possible values include: 'Semantic', 'Full',
+     * 'SingleBox'.
      */
     @JsonProperty(value = "compileMode")
     private CompileMode compileMode;
 
     /**
-     * Get the compileMode value.
+     * Get the specific compilation mode for the job used during execution. If this is not specified during submission, the server will determine the optimal compilation mode. Possible values include: 'Semantic', 'Full', 'SingleBox'.
      *
      * @return the compileMode value
      */
@@ -37,7 +37,7 @@ public class CreateUSqlJobProperties extends CreateJobProperties {
     }
 
     /**
-     * Set the compileMode value.
+     * Set the specific compilation mode for the job used during execution. If this is not specified during submission, the server will determine the optimal compilation mode. Possible values include: 'Semantic', 'Full', 'SingleBox'.
      *
      * @param compileMode the compileMode value to set
      * @return the CreateUSqlJobProperties object itself.

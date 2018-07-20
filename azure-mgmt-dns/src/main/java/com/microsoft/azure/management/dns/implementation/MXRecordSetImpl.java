@@ -21,15 +21,13 @@ import java.util.List;
 class MXRecordSetImpl
         extends DnsRecordSetImpl
         implements MXRecordSet {
-    MXRecordSetImpl(final DnsZoneImpl parent, final RecordSetInner innerModel) {
-        super(parent, innerModel);
+    MXRecordSetImpl(final String name, final DnsZoneImpl parent, final RecordSetInner innerModel) {
+        super(name, RecordType.MX.toString(), parent, innerModel);
     }
 
     static MXRecordSetImpl newRecordSet(final String name, final DnsZoneImpl parent) {
-        return new MXRecordSetImpl(parent,
+        return new MXRecordSetImpl(name, parent,
                 new RecordSetInner()
-                        .withName(name)
-                        .withType(RecordType.MX.toString())
                         .withMxRecords(new ArrayList<MxRecord>()));
     }
 
@@ -57,7 +55,7 @@ class MXRecordSetImpl
                 for (MxRecord recordToRemove : this.recordSetRemoveInfo.mxRecords()) {
                     for (MxRecord record : resource.mxRecords()) {
                         if (record.exchange().equalsIgnoreCase(recordToRemove.exchange())
-                                && (record.preference() == recordToRemove.preference())) {
+                                && (record.preference().equals(recordToRemove.preference()))) {
                             resource.mxRecords().remove(record);
                             break;
                         }

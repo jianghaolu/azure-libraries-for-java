@@ -8,38 +8,10 @@
 
 package com.microsoft.azure.management.eventhub.implementation;
 
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.azure.Resource;
 
 /**
  * Definition of Resource.
  */
 public class TrackedResourceInner extends Resource {
-    /**
-     * Resource tags.
-     */
-    @JsonProperty(value = "tags")
-    private Map<String, String> tags;
-
-    /**
-     * Get the tags value.
-     *
-     * @return the tags value
-     */
-    public Map<String, String> tags() {
-        return this.tags;
-    }
-
-    /**
-     * Set the tags value.
-     *
-     * @param tags the tags value to set
-     * @return the TrackedResourceInner object itself.
-     */
-    public TrackedResourceInner withTags(Map<String, String> tags) {
-        this.tags = tags;
-        return this;
-    }
-
 }

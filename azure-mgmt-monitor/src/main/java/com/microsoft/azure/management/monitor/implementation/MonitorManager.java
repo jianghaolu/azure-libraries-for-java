@@ -12,6 +12,10 @@ import com.microsoft.azure.AzureResponseBuilder;
 import com.microsoft.azure.credentials.AzureTokenCredentials;
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Beta.SinceVersion;
+import com.microsoft.azure.management.monitor.ActionGroups;
+import com.microsoft.azure.management.monitor.ActivityLogs;
+import com.microsoft.azure.management.monitor.DiagnosticSettings;
+import com.microsoft.azure.management.monitor.MetricDefinitions;
 import com.microsoft.azure.management.resources.fluentcore.arm.AzureConfigurable;
 import com.microsoft.azure.management.resources.fluentcore.arm.implementation.AzureConfigurableImpl;
 import com.microsoft.azure.management.resources.fluentcore.arm.implementation.Manager;
@@ -24,19 +28,11 @@ import com.microsoft.rest.RestClient;
  */
 @Beta(SinceVersion.V1_2_0)
 public final class MonitorManager extends Manager<MonitorManager, MonitorManagementClientImpl> {
-    private final MonitorClientImpl innerEx;
-
-    /**
-     * @return wrapped inner object providing direct access to the underlying
-     * auto-generated API implementation, based on Azure REST API
-     */
-
-    /**
-     * @return Auto-generated client for additional methods in the Azure Monitor API.
-     */
-    public MonitorClientImpl innerEx() {
-        return innerEx;
-    }
+    // Collections
+    private ActivityLogs activityLogs;
+    private MetricDefinitions metricDefinitions;
+    private DiagnosticSettings diagnosticSettings;
+    private ActionGroups actionGroups;
 
     /**
     * Get a Configurable instance that can be used to create MonitorManager with optional configuration.
@@ -85,6 +81,48 @@ public final class MonitorManager extends Manager<MonitorManager, MonitorManagem
         */
         MonitorManager authenticate(AzureTokenCredentials credentials, String subscriptionId);
     }
+
+    /**
+     * @return the Azure Activity Logs API entry point
+     */
+    public ActivityLogs activityLogs() {
+        if (this.activityLogs == null) {
+            this.activityLogs = new ActivityLogsImpl(this);
+        }
+        return this.activityLogs;
+    }
+
+    /**
+     * @return the Azure Metric Definitions API entry point
+     */
+    public MetricDefinitions metricDefinitions() {
+        if (this.metricDefinitions == null) {
+            this.metricDefinitions = new MetricDefinitionsImpl(this);
+        }
+        return this.metricDefinitions;
+    }
+
+    /**
+     * @return the Azure Diagnostic Settings API entry point
+     */
+    @Beta(SinceVersion.V1_8_0)
+    public DiagnosticSettings diagnosticSettings() {
+        if (this.diagnosticSettings == null) {
+            this.diagnosticSettings = new DiagnosticSettingsImpl(this);
+        }
+        return this.diagnosticSettings;
+    }
+
+    /**
+     * @return the Azure Action Groups API entry point
+     */
+    @Beta(SinceVersion.V1_8_0)
+    public ActionGroups actionGroups() {
+        if (this.actionGroups == null) {
+            this.actionGroups = new ActionGroupsImpl(this);
+        }
+        return this.actionGroups;
+    }
     /**
     * The implementation for Configurable interface.
     */
@@ -99,7 +137,5 @@ public final class MonitorManager extends Manager<MonitorManager, MonitorManagem
                 restClient,
                 subscriptionId,
                 new MonitorManagementClientImpl(restClient).withSubscriptionId(subscriptionId));
-
-        innerEx = new MonitorClientImpl(restClient).withSubscriptionId(subscriptionId);
     }
 }

@@ -10,8 +10,10 @@ package com.microsoft.azure.management.datalake.analytics;
 
 import com.microsoft.azure.CloudException;
 import com.microsoft.azure.ListOperationCallback;
+import com.microsoft.azure.management.datalake.analytics.models.Acl;
+import com.microsoft.azure.management.datalake.analytics.models.AclCreateOrUpdateParameters;
+import com.microsoft.azure.management.datalake.analytics.models.AclDeleteParameters;
 import com.microsoft.azure.management.datalake.analytics.models.DataLakeAnalyticsCatalogCredentialCreateParameters;
-import com.microsoft.azure.management.datalake.analytics.models.DataLakeAnalyticsCatalogCredentialDeleteParameters;
 import com.microsoft.azure.management.datalake.analytics.models.DataLakeAnalyticsCatalogCredentialUpdateParameters;
 import com.microsoft.azure.management.datalake.analytics.models.DataLakeAnalyticsCatalogSecretCreateOrUpdateParameters;
 import com.microsoft.azure.management.datalake.analytics.models.USqlAssembly;
@@ -24,7 +26,9 @@ import com.microsoft.azure.management.datalake.analytics.models.USqlProcedure;
 import com.microsoft.azure.management.datalake.analytics.models.USqlSchema;
 import com.microsoft.azure.management.datalake.analytics.models.USqlSecret;
 import com.microsoft.azure.management.datalake.analytics.models.USqlTable;
+import com.microsoft.azure.management.datalake.analytics.models.USqlTableFragment;
 import com.microsoft.azure.management.datalake.analytics.models.USqlTablePartition;
+import com.microsoft.azure.management.datalake.analytics.models.USqlTablePreview;
 import com.microsoft.azure.management.datalake.analytics.models.USqlTableStatistics;
 import com.microsoft.azure.management.datalake.analytics.models.USqlTableType;
 import com.microsoft.azure.management.datalake.analytics.models.USqlTableValuedFunction;
@@ -92,6 +96,53 @@ public interface Catalogs {
      * @return the {@link ServiceResponse} object if successful.
      */
     Observable<ServiceResponse<Void>> createSecretWithServiceResponseAsync(String accountName, String databaseName, String secretName, DataLakeAnalyticsCatalogSecretCreateOrUpdateParameters parameters);
+
+    /**
+     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the secret.
+     * @param secretName The name of the secret to get
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the USqlSecret object if successful.
+     */
+    USqlSecret getSecret(String accountName, String databaseName, String secretName);
+
+    /**
+     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the secret.
+     * @param secretName The name of the secret to get
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<USqlSecret> getSecretAsync(String accountName, String databaseName, String secretName, final ServiceCallback<USqlSecret> serviceCallback);
+
+    /**
+     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the secret.
+     * @param secretName The name of the secret to get
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlSecret object
+     */
+    Observable<USqlSecret> getSecretAsync(String accountName, String databaseName, String secretName);
+
+    /**
+     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the secret.
+     * @param secretName The name of the secret to get
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlSecret object
+     */
+    Observable<ServiceResponse<USqlSecret>> getSecretWithServiceResponseAsync(String accountName, String databaseName, String secretName);
 
     /**
      * Modifies the specified secret for use with external data sources in the specified database. This is deprecated and will be removed in the next release. Please use UpdateCredential instead.
@@ -190,53 +241,6 @@ public interface Catalogs {
     Observable<ServiceResponse<Void>> deleteSecretWithServiceResponseAsync(String accountName, String databaseName, String secretName);
 
     /**
-     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the secret.
-     * @param secretName The name of the secret to get
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the USqlSecret object if successful.
-     */
-    USqlSecret getSecret(String accountName, String databaseName, String secretName);
-
-    /**
-     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the secret.
-     * @param secretName The name of the secret to get
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
-     */
-    ServiceFuture<USqlSecret> getSecretAsync(String accountName, String databaseName, String secretName, final ServiceCallback<USqlSecret> serviceCallback);
-
-    /**
-     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the secret.
-     * @param secretName The name of the secret to get
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the USqlSecret object
-     */
-    Observable<USqlSecret> getSecretAsync(String accountName, String databaseName, String secretName);
-
-    /**
-     * Gets the specified secret in the specified database. This is deprecated and will be removed in the next release. Please use GetCredential instead.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the secret.
-     * @param secretName The name of the secret to get
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the USqlSecret object
-     */
-    Observable<ServiceResponse<USqlSecret>> getSecretWithServiceResponseAsync(String accountName, String databaseName, String secretName);
-
-    /**
      * Deletes all secrets in the specified database. This is deprecated and will be removed in the next release. In the future, please only drop individual credentials using DeleteCredential.
      *
      * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
@@ -327,6 +331,53 @@ public interface Catalogs {
      * @return the {@link ServiceResponse} object if successful.
      */
     Observable<ServiceResponse<Void>> createCredentialWithServiceResponseAsync(String accountName, String databaseName, String credentialName, DataLakeAnalyticsCatalogCredentialCreateParameters parameters);
+
+    /**
+     * Retrieves the specified credential from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the schema.
+     * @param credentialName The name of the credential.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the USqlCredential object if successful.
+     */
+    USqlCredential getCredential(String accountName, String databaseName, String credentialName);
+
+    /**
+     * Retrieves the specified credential from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the schema.
+     * @param credentialName The name of the credential.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<USqlCredential> getCredentialAsync(String accountName, String databaseName, String credentialName, final ServiceCallback<USqlCredential> serviceCallback);
+
+    /**
+     * Retrieves the specified credential from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the schema.
+     * @param credentialName The name of the credential.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlCredential object
+     */
+    Observable<USqlCredential> getCredentialAsync(String accountName, String databaseName, String credentialName);
+
+    /**
+     * Retrieves the specified credential from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the schema.
+     * @param credentialName The name of the credential.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlCredential object
+     */
+    Observable<ServiceResponse<USqlCredential>> getCredentialWithServiceResponseAsync(String accountName, String databaseName, String credentialName);
 
     /**
      * Modifies the specified credential for use with external data sources in the specified database.
@@ -429,13 +480,13 @@ public interface Catalogs {
      * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
      * @param databaseName The name of the database containing the credential.
      * @param credentialName The name of the credential to delete
-     * @param parameters The parameters to delete a credential if the current user is not the account owner.
      * @param cascade Indicates if the delete should be a cascading delete (which deletes all resources dependent on the credential as well as the credential) or not. If false will fail if there are any resources relying on the credential.
+     * @param password the current password for the credential and user with access to the data source. This is required if the requester is not the account owner.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @throws CloudException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      */
-    void deleteCredential(String accountName, String databaseName, String credentialName, DataLakeAnalyticsCatalogCredentialDeleteParameters parameters, Boolean cascade);
+    void deleteCredential(String accountName, String databaseName, String credentialName, Boolean cascade, String password);
 
     /**
      * Deletes the specified credential in the specified database.
@@ -443,13 +494,13 @@ public interface Catalogs {
      * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
      * @param databaseName The name of the database containing the credential.
      * @param credentialName The name of the credential to delete
-     * @param parameters The parameters to delete a credential if the current user is not the account owner.
      * @param cascade Indicates if the delete should be a cascading delete (which deletes all resources dependent on the credential as well as the credential) or not. If false will fail if there are any resources relying on the credential.
+     * @param password the current password for the credential and user with access to the data source. This is required if the requester is not the account owner.
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
-    ServiceFuture<Void> deleteCredentialAsync(String accountName, String databaseName, String credentialName, DataLakeAnalyticsCatalogCredentialDeleteParameters parameters, Boolean cascade, final ServiceCallback<Void> serviceCallback);
+    ServiceFuture<Void> deleteCredentialAsync(String accountName, String databaseName, String credentialName, Boolean cascade, String password, final ServiceCallback<Void> serviceCallback);
 
     /**
      * Deletes the specified credential in the specified database.
@@ -457,12 +508,12 @@ public interface Catalogs {
      * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
      * @param databaseName The name of the database containing the credential.
      * @param credentialName The name of the credential to delete
-     * @param parameters The parameters to delete a credential if the current user is not the account owner.
      * @param cascade Indicates if the delete should be a cascading delete (which deletes all resources dependent on the credential as well as the credential) or not. If false will fail if there are any resources relying on the credential.
+     * @param password the current password for the credential and user with access to the data source. This is required if the requester is not the account owner.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
-    Observable<Void> deleteCredentialAsync(String accountName, String databaseName, String credentialName, DataLakeAnalyticsCatalogCredentialDeleteParameters parameters, Boolean cascade);
+    Observable<Void> deleteCredentialAsync(String accountName, String databaseName, String credentialName, Boolean cascade, String password);
 
     /**
      * Deletes the specified credential in the specified database.
@@ -470,59 +521,12 @@ public interface Catalogs {
      * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
      * @param databaseName The name of the database containing the credential.
      * @param credentialName The name of the credential to delete
-     * @param parameters The parameters to delete a credential if the current user is not the account owner.
      * @param cascade Indicates if the delete should be a cascading delete (which deletes all resources dependent on the credential as well as the credential) or not. If false will fail if there are any resources relying on the credential.
+     * @param password the current password for the credential and user with access to the data source. This is required if the requester is not the account owner.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceResponse} object if successful.
      */
-    Observable<ServiceResponse<Void>> deleteCredentialWithServiceResponseAsync(String accountName, String databaseName, String credentialName, DataLakeAnalyticsCatalogCredentialDeleteParameters parameters, Boolean cascade);
-
-    /**
-     * Retrieves the specified credential from the Data Lake Analytics catalog.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the schema.
-     * @param credentialName The name of the credential.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @throws CloudException thrown if the request is rejected by server
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
-     * @return the USqlCredential object if successful.
-     */
-    USqlCredential getCredential(String accountName, String databaseName, String credentialName);
-
-    /**
-     * Retrieves the specified credential from the Data Lake Analytics catalog.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the schema.
-     * @param credentialName The name of the credential.
-     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the {@link ServiceFuture} object
-     */
-    ServiceFuture<USqlCredential> getCredentialAsync(String accountName, String databaseName, String credentialName, final ServiceCallback<USqlCredential> serviceCallback);
-
-    /**
-     * Retrieves the specified credential from the Data Lake Analytics catalog.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the schema.
-     * @param credentialName The name of the credential.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the USqlCredential object
-     */
-    Observable<USqlCredential> getCredentialAsync(String accountName, String databaseName, String credentialName);
-
-    /**
-     * Retrieves the specified credential from the Data Lake Analytics catalog.
-     *
-     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
-     * @param databaseName The name of the database containing the schema.
-     * @param credentialName The name of the credential.
-     * @throws IllegalArgumentException thrown if parameters fail the validation
-     * @return the observable to the USqlCredential object
-     */
-    Observable<ServiceResponse<USqlCredential>> getCredentialWithServiceResponseAsync(String accountName, String databaseName, String credentialName);
+    Observable<ServiceResponse<Void>> deleteCredentialWithServiceResponseAsync(String accountName, String databaseName, String credentialName, Boolean cascade, String password);
 
     /**
      * Retrieves the list of credentials from the Data Lake Analytics catalog.
@@ -1007,6 +1011,131 @@ public interface Catalogs {
      * @return the observable to the USqlTable object
      */
     Observable<ServiceResponse<USqlTable>> getTableWithServiceResponseAsync(String accountName, String databaseName, String schemaName, String tableName);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;USqlTableFragment&gt; object if successful.
+     */
+    PagedList<USqlTableFragment> listTableFragments(final String accountName, final String databaseName, final String schemaName, final String tableName);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<USqlTableFragment>> listTableFragmentsAsync(final String accountName, final String databaseName, final String schemaName, final String tableName, final ListOperationCallback<USqlTableFragment> serviceCallback);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;USqlTableFragment&gt; object
+     */
+    Observable<Page<USqlTableFragment>> listTableFragmentsAsync(final String accountName, final String databaseName, final String schemaName, final String tableName);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;USqlTableFragment&gt; object
+     */
+    Observable<ServiceResponse<Page<USqlTableFragment>>> listTableFragmentsWithServiceResponseAsync(final String accountName, final String databaseName, final String schemaName, final String tableName);
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;USqlTableFragment&gt; object if successful.
+     */
+    PagedList<USqlTableFragment> listTableFragments(final String accountName, final String databaseName, final String schemaName, final String tableName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<USqlTableFragment>> listTableFragmentsAsync(final String accountName, final String databaseName, final String schemaName, final String tableName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count, final ListOperationCallback<USqlTableFragment> serviceCallback);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;USqlTableFragment&gt; object
+     */
+    Observable<Page<USqlTableFragment>> listTableFragmentsAsync(final String accountName, final String databaseName, final String schemaName, final String tableName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table fragments.
+     * @param schemaName The name of the schema containing the table fragments.
+     * @param tableName The name of the table containing the table fragments.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;USqlTableFragment&gt; object
+     */
+    Observable<ServiceResponse<Page<USqlTableFragment>>> listTableFragmentsWithServiceResponseAsync(final String accountName, final String databaseName, final String schemaName, final String tableName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
 
     /**
      * Retrieves the list of tables from the Data Lake Analytics catalog.
@@ -1931,6 +2060,123 @@ public interface Catalogs {
     Observable<ServiceResponse<Page<USqlTableStatistics>>> listTableStatisticsWithServiceResponseAsync(final String accountName, final String databaseName, final String schemaName, final String tableName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
 
     /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the USqlTablePreview object if successful.
+     */
+    USqlTablePreview previewTablePartition(String accountName, String databaseName, String schemaName, String tableName, String partitionName);
+
+    /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<USqlTablePreview> previewTablePartitionAsync(String accountName, String databaseName, String schemaName, String tableName, String partitionName, final ServiceCallback<USqlTablePreview> serviceCallback);
+
+    /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<USqlTablePreview> previewTablePartitionAsync(String accountName, String databaseName, String schemaName, String tableName, String partitionName);
+
+    /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<ServiceResponse<USqlTablePreview>> previewTablePartitionWithServiceResponseAsync(String accountName, String databaseName, String schemaName, String tableName, String partitionName);
+    /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @param maxRows The maximum number of preview rows to be retrieved.Rows returned may be less than or equal to this number depending on row sizes and number of rows in the partition.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the USqlTablePreview object if successful.
+     */
+    USqlTablePreview previewTablePartition(String accountName, String databaseName, String schemaName, String tableName, String partitionName, Long maxRows, Long maxColumns);
+
+    /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @param maxRows The maximum number of preview rows to be retrieved.Rows returned may be less than or equal to this number depending on row sizes and number of rows in the partition.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<USqlTablePreview> previewTablePartitionAsync(String accountName, String databaseName, String schemaName, String tableName, String partitionName, Long maxRows, Long maxColumns, final ServiceCallback<USqlTablePreview> serviceCallback);
+
+    /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @param maxRows The maximum number of preview rows to be retrieved.Rows returned may be less than or equal to this number depending on row sizes and number of rows in the partition.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<USqlTablePreview> previewTablePartitionAsync(String accountName, String databaseName, String schemaName, String tableName, String partitionName, Long maxRows, Long maxColumns);
+
+    /**
+     * Retrieves a preview set of rows in given partition.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the partition.
+     * @param schemaName The name of the schema containing the partition.
+     * @param tableName The name of the table containing the partition.
+     * @param partitionName The name of the table partition.
+     * @param maxRows The maximum number of preview rows to be retrieved.Rows returned may be less than or equal to this number depending on row sizes and number of rows in the partition.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<ServiceResponse<USqlTablePreview>> previewTablePartitionWithServiceResponseAsync(String accountName, String databaseName, String schemaName, String tableName, String partitionName, Long maxRows, Long maxColumns);
+
+    /**
      * Retrieves the specified table partition from the Data Lake Analytics catalog.
      *
      * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
@@ -1984,6 +2230,115 @@ public interface Catalogs {
      * @return the observable to the USqlTablePartition object
      */
     Observable<ServiceResponse<USqlTablePartition>> getTablePartitionWithServiceResponseAsync(String accountName, String databaseName, String schemaName, String tableName, String partitionName);
+
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the USqlTablePreview object if successful.
+     */
+    USqlTablePreview previewTable(String accountName, String databaseName, String schemaName, String tableName);
+
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<USqlTablePreview> previewTableAsync(String accountName, String databaseName, String schemaName, String tableName, final ServiceCallback<USqlTablePreview> serviceCallback);
+
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<USqlTablePreview> previewTableAsync(String accountName, String databaseName, String schemaName, String tableName);
+
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<ServiceResponse<USqlTablePreview>> previewTableWithServiceResponseAsync(String accountName, String databaseName, String schemaName, String tableName);
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @param maxRows The maximum number of preview rows to be retrieved. Rows returned may be less than or equal to this number depending on row sizes and number of rows in the table.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the USqlTablePreview object if successful.
+     */
+    USqlTablePreview previewTable(String accountName, String databaseName, String schemaName, String tableName, Long maxRows, Long maxColumns);
+
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @param maxRows The maximum number of preview rows to be retrieved. Rows returned may be less than or equal to this number depending on row sizes and number of rows in the table.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<USqlTablePreview> previewTableAsync(String accountName, String databaseName, String schemaName, String tableName, Long maxRows, Long maxColumns, final ServiceCallback<USqlTablePreview> serviceCallback);
+
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @param maxRows The maximum number of preview rows to be retrieved. Rows returned may be less than or equal to this number depending on row sizes and number of rows in the table.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<USqlTablePreview> previewTableAsync(String accountName, String databaseName, String schemaName, String tableName, Long maxRows, Long maxColumns);
+
+    /**
+     * Retrieves a preview set of rows in given table.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database containing the table.
+     * @param schemaName The name of the schema containing the table.
+     * @param tableName The name of the table.
+     * @param maxRows The maximum number of preview rows to be retrieved. Rows returned may be less than or equal to this number depending on row sizes and number of rows in the table.
+     * @param maxColumns The maximum number of columns to be retrieved.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the USqlTablePreview object
+     */
+    Observable<ServiceResponse<USqlTablePreview>> previewTableWithServiceResponseAsync(String accountName, String databaseName, String schemaName, String tableName, Long maxRows, Long maxColumns);
 
     /**
      * Retrieves the list of table partitions from the Data Lake Analytics catalog.
@@ -3148,6 +3503,216 @@ public interface Catalogs {
     Observable<ServiceResponse<Page<USqlView>>> listViewsByDatabaseWithServiceResponseAsync(final String accountName, final String databaseName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
 
     /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;Acl&gt; object if successful.
+     */
+    PagedList<Acl> listAclsByDatabase(final String accountName, final String databaseName);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<Acl>> listAclsByDatabaseAsync(final String accountName, final String databaseName, final ListOperationCallback<Acl> serviceCallback);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<Page<Acl>> listAclsByDatabaseAsync(final String accountName, final String databaseName);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<ServiceResponse<Page<Acl>>> listAclsByDatabaseWithServiceResponseAsync(final String accountName, final String databaseName);
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;Acl&gt; object if successful.
+     */
+    PagedList<Acl> listAclsByDatabase(final String accountName, final String databaseName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<Acl>> listAclsByDatabaseAsync(final String accountName, final String databaseName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count, final ListOperationCallback<Acl> serviceCallback);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<Page<Acl>> listAclsByDatabaseAsync(final String accountName, final String databaseName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<ServiceResponse<Page<Acl>>> listAclsByDatabaseWithServiceResponseAsync(final String accountName, final String databaseName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;Acl&gt; object if successful.
+     */
+    PagedList<Acl> listAcls(final String accountName);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<Acl>> listAclsAsync(final String accountName, final ListOperationCallback<Acl> serviceCallback);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<Page<Acl>> listAclsAsync(final String accountName);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<ServiceResponse<Page<Acl>>> listAclsWithServiceResponseAsync(final String accountName);
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;Acl&gt; object if successful.
+     */
+    PagedList<Acl> listAcls(final String accountName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<Acl>> listAclsAsync(final String accountName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count, final ListOperationCallback<Acl> serviceCallback);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<Page<Acl>> listAclsAsync(final String accountName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param filter OData filter. Optional.
+     * @param top The number of items to return. Optional.
+     * @param skip The number of items to skip over before returning elements. Optional.
+     * @param select OData Select statement. Limits the properties on each entry to just those requested, e.g. Categories?$select=CategoryName,Description. Optional.
+     * @param orderby OrderBy clause. One or more comma-separated expressions with an optional "asc" (the default) or "desc" depending on the order you'd like the values sorted, e.g. Categories?$orderby=CategoryName desc. Optional.
+     * @param count The Boolean value of true or false to request a count of the matching resources included with the resources in the response, e.g. Categories?$count=true. Optional.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<ServiceResponse<Page<Acl>>> listAclsWithServiceResponseAsync(final String accountName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
+
+    /**
      * Retrieves the specified database from the Data Lake Analytics catalog.
      *
      * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
@@ -3292,6 +3857,182 @@ public interface Catalogs {
     Observable<ServiceResponse<Page<USqlDatabase>>> listDatabasesWithServiceResponseAsync(final String accountName, final String filter, final Integer top, final Integer skip, final String select, final String orderby, final Boolean count);
 
     /**
+     * Grants an access control list (ACL) entry to the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a Data Lake Analytics catalog.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     */
+    void grantAcl(String accountName, AclCreateOrUpdateParameters parameters);
+
+    /**
+     * Grants an access control list (ACL) entry to the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a Data Lake Analytics catalog.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<Void> grantAclAsync(String accountName, AclCreateOrUpdateParameters parameters, final ServiceCallback<Void> serviceCallback);
+
+    /**
+     * Grants an access control list (ACL) entry to the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a Data Lake Analytics catalog.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<Void> grantAclAsync(String accountName, AclCreateOrUpdateParameters parameters);
+
+    /**
+     * Grants an access control list (ACL) entry to the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a Data Lake Analytics catalog.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<ServiceResponse<Void>> grantAclWithServiceResponseAsync(String accountName, AclCreateOrUpdateParameters parameters);
+
+    /**
+     * Grants an access control list (ACL) entry to the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     */
+    void grantAclToDatabase(String accountName, String databaseName, AclCreateOrUpdateParameters parameters);
+
+    /**
+     * Grants an access control list (ACL) entry to the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a database.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<Void> grantAclToDatabaseAsync(String accountName, String databaseName, AclCreateOrUpdateParameters parameters, final ServiceCallback<Void> serviceCallback);
+
+    /**
+     * Grants an access control list (ACL) entry to the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<Void> grantAclToDatabaseAsync(String accountName, String databaseName, AclCreateOrUpdateParameters parameters);
+
+    /**
+     * Grants an access control list (ACL) entry to the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to create or update an access control list (ACL) entry for a database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<ServiceResponse<Void>> grantAclToDatabaseWithServiceResponseAsync(String accountName, String databaseName, AclCreateOrUpdateParameters parameters);
+
+    /**
+     * Revokes an access control list (ACL) entry from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry from a Data Lake Analytics catalog.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     */
+    void revokeAcl(String accountName, AclDeleteParameters parameters);
+
+    /**
+     * Revokes an access control list (ACL) entry from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry from a Data Lake Analytics catalog.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<Void> revokeAclAsync(String accountName, AclDeleteParameters parameters, final ServiceCallback<Void> serviceCallback);
+
+    /**
+     * Revokes an access control list (ACL) entry from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry from a Data Lake Analytics catalog.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<Void> revokeAclAsync(String accountName, AclDeleteParameters parameters);
+
+    /**
+     * Revokes an access control list (ACL) entry from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry from a Data Lake Analytics catalog.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<ServiceResponse<Void>> revokeAclWithServiceResponseAsync(String accountName, AclDeleteParameters parameters);
+
+    /**
+     * Revokes an access control list (ACL) entry for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry for a database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     */
+    void revokeAclFromDatabase(String accountName, String databaseName, AclDeleteParameters parameters);
+
+    /**
+     * Revokes an access control list (ACL) entry for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry for a database.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<Void> revokeAclFromDatabaseAsync(String accountName, String databaseName, AclDeleteParameters parameters, final ServiceCallback<Void> serviceCallback);
+
+    /**
+     * Revokes an access control list (ACL) entry for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry for a database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<Void> revokeAclFromDatabaseAsync(String accountName, String databaseName, AclDeleteParameters parameters);
+
+    /**
+     * Revokes an access control list (ACL) entry for the database from the Data Lake Analytics catalog.
+     *
+     * @param accountName The Azure Data Lake Analytics account upon which to execute catalog operations.
+     * @param databaseName The name of the database.
+     * @param parameters Parameters supplied to delete an access control list (ACL) entry for a database.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceResponse} object if successful.
+     */
+    Observable<ServiceResponse<Void>> revokeAclFromDatabaseWithServiceResponseAsync(String accountName, String databaseName, AclDeleteParameters parameters);
+
+    /**
      * Retrieves the list of credentials from the Data Lake Analytics catalog.
      *
      * @param nextPageLink The NextLink from the previous successful call to List operation.
@@ -3410,6 +4151,46 @@ public interface Catalogs {
      * @return the observable to the PagedList&lt;USqlProcedure&gt; object
      */
     Observable<ServiceResponse<Page<USqlProcedure>>> listProceduresNextWithServiceResponseAsync(final String nextPageLink);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;USqlTableFragment&gt; object if successful.
+     */
+    PagedList<USqlTableFragment> listTableFragmentsNext(final String nextPageLink);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @param serviceFuture the ServiceFuture object tracking the Retrofit calls
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<USqlTableFragment>> listTableFragmentsNextAsync(final String nextPageLink, final ServiceFuture<List<USqlTableFragment>> serviceFuture, final ListOperationCallback<USqlTableFragment> serviceCallback);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;USqlTableFragment&gt; object
+     */
+    Observable<Page<USqlTableFragment>> listTableFragmentsNextAsync(final String nextPageLink);
+
+    /**
+     * Retrieves the list of table fragments from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;USqlTableFragment&gt; object
+     */
+    Observable<ServiceResponse<Page<USqlTableFragment>>> listTableFragmentsNextWithServiceResponseAsync(final String nextPageLink);
 
     /**
      * Retrieves the list of tables from the Data Lake Analytics catalog.
@@ -4010,6 +4791,86 @@ public interface Catalogs {
      * @return the observable to the PagedList&lt;USqlView&gt; object
      */
     Observable<ServiceResponse<Page<USqlView>>> listViewsByDatabaseNextWithServiceResponseAsync(final String nextPageLink);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;Acl&gt; object if successful.
+     */
+    PagedList<Acl> listAclsByDatabaseNext(final String nextPageLink);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @param serviceFuture the ServiceFuture object tracking the Retrofit calls
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<Acl>> listAclsByDatabaseNextAsync(final String nextPageLink, final ServiceFuture<List<Acl>> serviceFuture, final ListOperationCallback<Acl> serviceCallback);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<Page<Acl>> listAclsByDatabaseNextAsync(final String nextPageLink);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the database from the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<ServiceResponse<Page<Acl>>> listAclsByDatabaseNextWithServiceResponseAsync(final String nextPageLink);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;Acl&gt; object if successful.
+     */
+    PagedList<Acl> listAclsNext(final String nextPageLink);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @param serviceFuture the ServiceFuture object tracking the Retrofit calls
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    ServiceFuture<List<Acl>> listAclsNextAsync(final String nextPageLink, final ServiceFuture<List<Acl>> serviceFuture, final ListOperationCallback<Acl> serviceCallback);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<Page<Acl>> listAclsNextAsync(final String nextPageLink);
+
+    /**
+     * Retrieves the list of access control list (ACL) entries for the Data Lake Analytics catalog.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;Acl&gt; object
+     */
+    Observable<ServiceResponse<Page<Acl>>> listAclsNextWithServiceResponseAsync(final String nextPageLink);
 
     /**
      * Retrieves the list of databases from the Data Lake Analytics catalog.

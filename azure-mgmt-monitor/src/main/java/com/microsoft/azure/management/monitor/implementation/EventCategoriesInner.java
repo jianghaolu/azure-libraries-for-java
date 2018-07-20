@@ -33,7 +33,7 @@ public class EventCategoriesInner {
     /** The Retrofit service to perform REST calls. */
     private EventCategoriesService service;
     /** The service client containing this operation class. */
-    private MonitorClientImpl client;
+    private MonitorManagementClientImpl client;
 
     /**
      * Initializes an instance of EventCategoriesInner.
@@ -41,7 +41,7 @@ public class EventCategoriesInner {
      * @param retrofit the Retrofit instance built from a Retrofit Builder.
      * @param client the instance of the service client containing this operation class.
      */
-    public EventCategoriesInner(Retrofit retrofit, MonitorClientImpl client) {
+    public EventCategoriesInner(Retrofit retrofit, MonitorManagementClientImpl client) {
         this.service = retrofit.create(EventCategoriesService.class);
         this.client = client;
     }
@@ -58,7 +58,7 @@ public class EventCategoriesInner {
     }
 
     /**
-     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Aministrative, Security, ServiceHealth, Alert, Recommendation, Policy.
+     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Administrative, Security, ServiceHealth, Alert, Recommendation, Policy.
      *
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @throws ErrorResponseException thrown if the request is rejected by server
@@ -70,7 +70,7 @@ public class EventCategoriesInner {
     }
 
     /**
-     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Aministrative, Security, ServiceHealth, Alert, Recommendation, Policy.
+     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Administrative, Security, ServiceHealth, Alert, Recommendation, Policy.
      *
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
      * @throws IllegalArgumentException thrown if parameters fail the validation
@@ -81,7 +81,7 @@ public class EventCategoriesInner {
     }
 
     /**
-     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Aministrative, Security, ServiceHealth, Alert, Recommendation, Policy.
+     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Administrative, Security, ServiceHealth, Alert, Recommendation, Policy.
      *
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;LocalizableStringInner&gt; object
@@ -96,7 +96,7 @@ public class EventCategoriesInner {
     }
 
     /**
-     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Aministrative, Security, ServiceHealth, Alert, Recommendation, Policy.
+     * Get the list of available event categories supported in the Activity Logs Service.&lt;br&gt;The current list includes the following: Administrative, Security, ServiceHealth, Alert, Recommendation, Policy.
      *
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;LocalizableStringInner&gt; object
@@ -108,7 +108,7 @@ public class EventCategoriesInner {
                 @Override
                 public Observable<ServiceResponse<List<LocalizableStringInner>>> call(Response<ResponseBody> response) {
                     try {
-                        ServiceResponse<PageImpl<LocalizableStringInner>> result = listDelegate(response);
+                        ServiceResponse<PageImpl1<LocalizableStringInner>> result = listDelegate(response);
                         ServiceResponse<List<LocalizableStringInner>> clientResponse = new ServiceResponse<List<LocalizableStringInner>>(result.body().items(), result.response());
                         return Observable.just(clientResponse);
                     } catch (Throwable t) {
@@ -118,9 +118,9 @@ public class EventCategoriesInner {
             });
     }
 
-    private ServiceResponse<PageImpl<LocalizableStringInner>> listDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException {
-        return this.client.restClient().responseBuilderFactory().<PageImpl<LocalizableStringInner>, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<PageImpl<LocalizableStringInner>>() { }.getType())
+    private ServiceResponse<PageImpl1<LocalizableStringInner>> listDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException {
+        return this.client.restClient().responseBuilderFactory().<PageImpl1<LocalizableStringInner>, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<PageImpl1<LocalizableStringInner>>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }

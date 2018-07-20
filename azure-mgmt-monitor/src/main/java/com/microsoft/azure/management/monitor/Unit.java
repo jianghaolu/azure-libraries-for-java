@@ -34,7 +34,13 @@ public enum Unit {
     PERCENT("Percent"),
 
     /** Enum value MilliSeconds. */
-    MILLI_SECONDS("MilliSeconds");
+    MILLI_SECONDS("MilliSeconds"),
+
+    /** Enum value ByteSeconds. */
+    BYTE_SECONDS("ByteSeconds"),
+
+    /** Enum value Unspecified. */
+    UNSPECIFIED("Unspecified");
 
     /** The actual serialized value for a Unit instance. */
     private String value;

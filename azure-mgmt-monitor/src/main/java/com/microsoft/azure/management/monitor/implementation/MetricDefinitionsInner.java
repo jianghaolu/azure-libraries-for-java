@@ -34,7 +34,7 @@ public class MetricDefinitionsInner {
     /** The Retrofit service to perform REST calls. */
     private MetricDefinitionsService service;
     /** The service client containing this operation class. */
-    private MonitorClientImpl client;
+    private MonitorManagementClientImpl client;
 
     /**
      * Initializes an instance of MetricDefinitionsInner.
@@ -42,7 +42,7 @@ public class MetricDefinitionsInner {
      * @param retrofit the Retrofit instance built from a Retrofit Builder.
      * @param client the instance of the service client containing this operation class.
      */
-    public MetricDefinitionsInner(Retrofit retrofit, MonitorClientImpl client) {
+    public MetricDefinitionsInner(Retrofit retrofit, MonitorManagementClientImpl client) {
         this.service = retrofit.create(MetricDefinitionsService.class);
         this.client = client;
     }
@@ -54,7 +54,7 @@ public class MetricDefinitionsInner {
     interface MetricDefinitionsService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.monitor.MetricDefinitions list" })
         @GET("{resourceUri}/providers/microsoft.insights/metricDefinitions")
-        Observable<Response<ResponseBody>> list(@Path(value = "resourceUri", encoded = true) String resourceUri, @Query("api-version") String apiVersion, @Query("$filter") String filter, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        Observable<Response<ResponseBody>> list(@Path(value = "resourceUri", encoded = true) String resourceUri, @Query("api-version") String apiVersion, @Query("metricnamespace") String metricnamespace, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
     }
 
@@ -110,14 +110,14 @@ public class MetricDefinitionsInner {
         if (resourceUri == null) {
             throw new IllegalArgumentException("Parameter resourceUri is required and cannot be null.");
         }
-        final String apiVersion = "2016-03-01";
-        final String filter = null;
-        return service.list(resourceUri, apiVersion, filter, this.client.acceptLanguage(), this.client.userAgent())
+        final String apiVersion = "2018-01-01";
+        final String metricnamespace = null;
+        return service.list(resourceUri, apiVersion, metricnamespace, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<MetricDefinitionInner>>>>() {
                 @Override
                 public Observable<ServiceResponse<List<MetricDefinitionInner>>> call(Response<ResponseBody> response) {
                     try {
-                        ServiceResponse<PageImpl<MetricDefinitionInner>> result = listDelegate(response);
+                        ServiceResponse<PageImpl1<MetricDefinitionInner>> result = listDelegate(response);
                         ServiceResponse<List<MetricDefinitionInner>> clientResponse = new ServiceResponse<List<MetricDefinitionInner>>(result.body().items(), result.response());
                         return Observable.just(clientResponse);
                     } catch (Throwable t) {
@@ -131,39 +131,39 @@ public class MetricDefinitionsInner {
      * Lists the metric definitions for the resource.
      *
      * @param resourceUri The identifier of the resource.
-     * @param filter Reduces the set of data collected by retrieving particular metric definitions from all the definitions available for the resource.&lt;br&gt;For example, to get just the definition for the 'CPU percentage' counter: $filter=name.value eq '\Processor(_Total)\% Processor Time'.&lt;br&gt;Multiple metrics can be retrieved by joining together *'name eq &lt;value&gt;'* clauses separated by *or* logical operators.&lt;br&gt;**NOTE**: No other syntax is allowed.
+     * @param metricnamespace Metric namespace to query metric definitions for.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @throws ErrorResponseException thrown if the request is rejected by server
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
      * @return the List&lt;MetricDefinitionInner&gt; object if successful.
      */
-    public List<MetricDefinitionInner> list(String resourceUri, String filter) {
-        return listWithServiceResponseAsync(resourceUri, filter).toBlocking().single().body();
+    public List<MetricDefinitionInner> list(String resourceUri, String metricnamespace) {
+        return listWithServiceResponseAsync(resourceUri, metricnamespace).toBlocking().single().body();
     }
 
     /**
      * Lists the metric definitions for the resource.
      *
      * @param resourceUri The identifier of the resource.
-     * @param filter Reduces the set of data collected by retrieving particular metric definitions from all the definitions available for the resource.&lt;br&gt;For example, to get just the definition for the 'CPU percentage' counter: $filter=name.value eq '\Processor(_Total)\% Processor Time'.&lt;br&gt;Multiple metrics can be retrieved by joining together *'name eq &lt;value&gt;'* clauses separated by *or* logical operators.&lt;br&gt;**NOTE**: No other syntax is allowed.
+     * @param metricnamespace Metric namespace to query metric definitions for.
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the {@link ServiceFuture} object
      */
-    public ServiceFuture<List<MetricDefinitionInner>> listAsync(String resourceUri, String filter, final ServiceCallback<List<MetricDefinitionInner>> serviceCallback) {
-        return ServiceFuture.fromResponse(listWithServiceResponseAsync(resourceUri, filter), serviceCallback);
+    public ServiceFuture<List<MetricDefinitionInner>> listAsync(String resourceUri, String metricnamespace, final ServiceCallback<List<MetricDefinitionInner>> serviceCallback) {
+        return ServiceFuture.fromResponse(listWithServiceResponseAsync(resourceUri, metricnamespace), serviceCallback);
     }
 
     /**
      * Lists the metric definitions for the resource.
      *
      * @param resourceUri The identifier of the resource.
-     * @param filter Reduces the set of data collected by retrieving particular metric definitions from all the definitions available for the resource.&lt;br&gt;For example, to get just the definition for the 'CPU percentage' counter: $filter=name.value eq '\Processor(_Total)\% Processor Time'.&lt;br&gt;Multiple metrics can be retrieved by joining together *'name eq &lt;value&gt;'* clauses separated by *or* logical operators.&lt;br&gt;**NOTE**: No other syntax is allowed.
+     * @param metricnamespace Metric namespace to query metric definitions for.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;MetricDefinitionInner&gt; object
      */
-    public Observable<List<MetricDefinitionInner>> listAsync(String resourceUri, String filter) {
-        return listWithServiceResponseAsync(resourceUri, filter).map(new Func1<ServiceResponse<List<MetricDefinitionInner>>, List<MetricDefinitionInner>>() {
+    public Observable<List<MetricDefinitionInner>> listAsync(String resourceUri, String metricnamespace) {
+        return listWithServiceResponseAsync(resourceUri, metricnamespace).map(new Func1<ServiceResponse<List<MetricDefinitionInner>>, List<MetricDefinitionInner>>() {
             @Override
             public List<MetricDefinitionInner> call(ServiceResponse<List<MetricDefinitionInner>> response) {
                 return response.body();
@@ -175,21 +175,21 @@ public class MetricDefinitionsInner {
      * Lists the metric definitions for the resource.
      *
      * @param resourceUri The identifier of the resource.
-     * @param filter Reduces the set of data collected by retrieving particular metric definitions from all the definitions available for the resource.&lt;br&gt;For example, to get just the definition for the 'CPU percentage' counter: $filter=name.value eq '\Processor(_Total)\% Processor Time'.&lt;br&gt;Multiple metrics can be retrieved by joining together *'name eq &lt;value&gt;'* clauses separated by *or* logical operators.&lt;br&gt;**NOTE**: No other syntax is allowed.
+     * @param metricnamespace Metric namespace to query metric definitions for.
      * @throws IllegalArgumentException thrown if parameters fail the validation
      * @return the observable to the List&lt;MetricDefinitionInner&gt; object
      */
-    public Observable<ServiceResponse<List<MetricDefinitionInner>>> listWithServiceResponseAsync(String resourceUri, String filter) {
+    public Observable<ServiceResponse<List<MetricDefinitionInner>>> listWithServiceResponseAsync(String resourceUri, String metricnamespace) {
         if (resourceUri == null) {
             throw new IllegalArgumentException("Parameter resourceUri is required and cannot be null.");
         }
-        final String apiVersion = "2016-03-01";
-        return service.list(resourceUri, apiVersion, filter, this.client.acceptLanguage(), this.client.userAgent())
+        final String apiVersion = "2018-01-01";
+        return service.list(resourceUri, apiVersion, metricnamespace, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<MetricDefinitionInner>>>>() {
                 @Override
                 public Observable<ServiceResponse<List<MetricDefinitionInner>>> call(Response<ResponseBody> response) {
                     try {
-                        ServiceResponse<PageImpl<MetricDefinitionInner>> result = listDelegate(response);
+                        ServiceResponse<PageImpl1<MetricDefinitionInner>> result = listDelegate(response);
                         ServiceResponse<List<MetricDefinitionInner>> clientResponse = new ServiceResponse<List<MetricDefinitionInner>>(result.body().items(), result.response());
                         return Observable.just(clientResponse);
                     } catch (Throwable t) {
@@ -199,9 +199,9 @@ public class MetricDefinitionsInner {
             });
     }
 
-    private ServiceResponse<PageImpl<MetricDefinitionInner>> listDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
-        return this.client.restClient().responseBuilderFactory().<PageImpl<MetricDefinitionInner>, ErrorResponseException>newInstance(this.client.serializerAdapter())
-                .register(200, new TypeToken<PageImpl<MetricDefinitionInner>>() { }.getType())
+    private ServiceResponse<PageImpl1<MetricDefinitionInner>> listDelegate(Response<ResponseBody> response) throws ErrorResponseException, IOException, IllegalArgumentException {
+        return this.client.restClient().responseBuilderFactory().<PageImpl1<MetricDefinitionInner>, ErrorResponseException>newInstance(this.client.serializerAdapter())
+                .register(200, new TypeToken<PageImpl1<MetricDefinitionInner>>() { }.getType())
                 .registerError(ErrorResponseException.class)
                 .build(response);
     }

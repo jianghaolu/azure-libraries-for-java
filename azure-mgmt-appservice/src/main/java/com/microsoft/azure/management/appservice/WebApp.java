@@ -7,6 +7,7 @@
 package com.microsoft.azure.management.appservice;
 
 import com.microsoft.azure.management.apigeneration.Beta;
+import com.microsoft.azure.management.apigeneration.Beta.SinceVersion;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.ResourceGroup;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.GroupableResource;
@@ -14,6 +15,10 @@ import com.microsoft.azure.management.resources.fluentcore.model.Appliable;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
+import rx.Completable;
+
+import java.io.File;
+import java.io.InputStream;
 
 /**
  * An immutable client-side representation of an Azure Web App.
@@ -28,6 +33,100 @@ public interface WebApp extends
      * @return the entry point to deployment slot management API under the web app
      */
     DeploymentSlots deploymentSlots();
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     */
+    @Beta(SinceVersion.V1_7_0)
+    void warDeploy(File warFile);
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     * @return a completable of the operation
+     */
+    @Beta(SinceVersion.V1_7_0)
+    Completable warDeployAsync(File warFile);
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     */
+    @Beta(SinceVersion.V1_7_0)
+    void warDeploy(InputStream warFile);
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     * @return a completable of the operation
+     */
+    @Beta(SinceVersion.V1_7_0)
+    Completable warDeployAsync(InputStream warFile);
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     * @param appName the name of the app, default to "ROOT" when not provided
+     */
+    @Beta(SinceVersion.V1_7_0)
+    void warDeploy(File warFile, String appName);
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     * @param appName the name of the app, default to "ROOT" when not provided
+     * @return a completable of the operation
+     */
+    @Beta(SinceVersion.V1_7_0)
+    Completable warDeployAsync(File warFile, String appName);
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     * @param appName the name of the app, default to "ROOT" when not provided
+     */
+    @Beta(SinceVersion.V1_7_0)
+    void warDeploy(InputStream warFile, String appName);
+
+    /**
+     * Deploys a WAR file onto the Azure specialized Tomcat on this web app.
+     * @param warFile the WAR file to upload
+     * @param appName the name of the app, default to "ROOT" when not provided
+     * @return a completable of the operation
+     */
+    @Beta(SinceVersion.V1_7_0)
+    Completable warDeployAsync(InputStream warFile, String appName);
+
+    /**
+     * Deploys a ZIP file onto the Azure specialized Java SE image on this web app.
+     * @param zipFile the ZIP file to upload
+     */
+    @Beta(SinceVersion.V1_13_0)
+    void zipDeploy(File zipFile);
+
+    /**
+     * Deploys a ZIP file onto the Azure specialized Java SE image on this web app.
+     * @param zipFile the ZIP file to upload
+     * @return a completable of the operation
+     */
+    @Beta(SinceVersion.V1_13_0)
+    Completable zipDeployAsync(File zipFile);
+
+    /**
+     * Deploys a ZIP file onto the Azure specialized Java SE image on this web app.
+     * @param zipFile the ZIP file to upload
+     */
+    @Beta(SinceVersion.V1_13_0)
+    void zipDeploy(InputStream zipFile);
+
+    /**
+     * Deploys a ZIP file onto the Azure specialized Java SE image on this web app.
+     * @param zipFile the ZIP file to upload
+     * @return a completable of the operation
+     */
+    @Beta(SinceVersion.V1_13_0)
+    Completable zipDeployAsync(InputStream zipFile);
 
     /**************************************************************
      * Fluent interfaces to provision a Web App

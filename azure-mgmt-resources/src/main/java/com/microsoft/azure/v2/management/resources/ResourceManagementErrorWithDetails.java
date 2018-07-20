@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * The ResourceManagementErrorWithDetails model.
+ * The detailed error message of resource management.
  */
 public class ResourceManagementErrorWithDetails {
     /**

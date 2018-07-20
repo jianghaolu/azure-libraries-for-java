@@ -12,34 +12,42 @@ import com.microsoft.azure.CloudException;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.appservice.AppServicePlan;
 import com.microsoft.azure.management.appservice.FunctionApp;
+import com.microsoft.azure.management.appservice.FunctionDeploymentSlots;
 import com.microsoft.azure.management.appservice.NameValuePair;
 import com.microsoft.azure.management.appservice.OperatingSystem;
 import com.microsoft.azure.management.appservice.PricingTier;
 import com.microsoft.azure.management.appservice.SkuDescription;
-import com.microsoft.azure.management.appservice.FunctionDeploymentSlots;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.storage.SkuName;
 import com.microsoft.azure.management.storage.StorageAccount;
 import com.microsoft.azure.management.storage.StorageAccountKey;
+import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.credentials.TokenCredentials;
 import okhttp3.Request;
 import org.joda.time.DateTime;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
-import retrofit2.http.DELETE;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Completable;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,18 +70,21 @@ class FunctionAppImpl
     private StorageAccount storageAccountToSet;
     private StorageAccount currentStorageAccount;
     private final FunctionAppKeyService functionAppKeyService;
-    private final FunctionKuduService functionKuduService;
+    private final FunctionService functionService;
+    private final KuduClient kuduClient;
     private FunctionDeploymentSlots deploymentSlots;
 
     FunctionAppImpl(final String name, SiteInner innerObject, SiteConfigResourceInner configObject, AppServiceManager manager) {
         super(name, innerObject, configObject, manager);
         functionAppKeyService = manager.restClient().retrofit().create(FunctionAppKeyService.class);
         String defaultHostName = defaultHostName().startsWith("http") ? defaultHostName() : "http://" + defaultHostName();
-        functionKuduService = manager.restClient().newBuilder()
+        functionService = manager.restClient().newBuilder()
                 .withBaseUrl(defaultHostName)
-                .withCredentials(new KuduCredentials(this))
+                .withCredentials(new FunctionCredentials(this))
+                .withLogLevel(LogLevel.BODY_AND_HEADERS)
                 .build()
-                .retrofit().create(FunctionKuduService.class);
+                .retrofit().create(FunctionService.class);
+        kuduClient = new KuduClient(this);
     }
 
     @Override
@@ -100,12 +111,12 @@ class FunctionAppImpl
     }
 
     @Override
-    Observable<SiteInner> submitAppSettings(final SiteInner site) {
+    Observable<Indexable> submitAppSettings() {
         if (storageAccountCreatable != null && this.taskResult(storageAccountCreatable.key()) != null) {
             storageAccountToSet = this.<StorageAccount>taskResult(storageAccountCreatable.key());
         }
         if (storageAccountToSet == null) {
-            return super.submitAppSettings(site);
+            return super.submitAppSettings();
         } else {
             return storageAccountToSet.getKeysAsync()
                 .flatMapIterable(new Func1<List<StorageAccountKey>, Iterable<StorageAccountKey>>() {
@@ -114,16 +125,16 @@ class FunctionAppImpl
                         return storageAccountKeys;
                     }
                 })
-                .first().flatMap(new Func1<StorageAccountKey, Observable<SiteInner>>() {
+                .first().flatMap(new Func1<StorageAccountKey, Observable<Indexable>>() {
                 @Override
-                public Observable<SiteInner> call(StorageAccountKey storageAccountKey) {
+                public Observable<Indexable> call(StorageAccountKey storageAccountKey) {
                     String connectionString = String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s",
                         storageAccountToSet.name(), storageAccountKey.value());
                     withAppSetting("AzureWebJobsStorage", connectionString);
                     withAppSetting("AzureWebJobsDashboard", connectionString);
                     withAppSetting("WEBSITE_CONTENTAZUREFILECONNECTIONSTRING", connectionString);
                     withAppSetting("WEBSITE_CONTENTSHARE", SdkContext.randomResourceName(name(), 32));
-                    return FunctionAppImpl.super.submitAppSettings(site);
+                    return FunctionAppImpl.super.submitAppSettings();
                 }
             }).doOnCompleted(new Action0() {
                     @Override
@@ -222,7 +233,7 @@ class FunctionAppImpl
 
     @Override
     public Observable<Map<String, String>> listFunctionKeysAsync(final String functionName) {
-        return functionKuduService.listFunctionKeys(functionName)
+        return functionService.listFunctionKeys(functionName)
                 .map(new Func1<FunctionKeyListResult, Map<String, String>>() {
                     @Override
                     public Map<String, String> call(FunctionKeyListResult result) {
@@ -245,9 +256,9 @@ class FunctionAppImpl
     @Override
     public Observable<NameValuePair> addFunctionKeyAsync(String functionName, String keyName, String keyValue) {
         if (keyValue != null) {
-            return functionKuduService.addFunctionKey(functionName, keyName, new NameValuePair().withName(keyName).withValue(keyValue));
+            return functionService.addFunctionKey(functionName, keyName, new NameValuePair().withName(keyName).withValue(keyValue));
         } else {
-            return functionKuduService.generateFunctionKey(functionName, keyName);
+            return functionService.generateFunctionKey(functionName, keyName);
         }
     }
 
@@ -258,7 +269,7 @@ class FunctionAppImpl
 
     @Override
     public Completable removeFunctionKeyAsync(String functionName, String keyName) {
-        return functionKuduService.deleteFunctionKey(functionName, keyName).toCompletable();
+        return functionService.deleteFunctionKey(functionName, keyName).toCompletable();
     }
 
     @Override
@@ -268,7 +279,8 @@ class FunctionAppImpl
 
     @Override
     public Completable syncTriggersAsync() {
-        return manager().inner().webApps().syncFunctionTriggersAsync(resourceGroupName(), name()).toCompletable()
+        return manager().inner().webApps().syncFunctionTriggersAsync(resourceGroupName(), name())
+                .toCompletable()
                 .onErrorResumeNext(new Func1<Throwable, Completable>() {
                     @Override
                     public Completable call(Throwable throwable) {
@@ -277,6 +289,55 @@ class FunctionAppImpl
                         } else {
                             return Completable.error(throwable);
                         }
+                    }
+                });
+    }
+
+    @Override
+    public InputStream streamApplicationLogs() {
+        PipedInputStreamWithCallback in = new PipedInputStreamWithCallback();
+        final PipedOutputStream out = new PipedOutputStream();
+        try {
+            in.connect(out);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        final Subscription subscription = streamApplicationLogsAsync()
+                // Do not block current thread
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        try {
+                            out.write(s.getBytes());
+                            out.write('\n');
+                            out.flush();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+        in.addCallback(new Action0() {
+            @Override
+            public void call() {
+                subscription.unsubscribe();
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return in;
+    }
+
+    @Override
+    public Observable<String> streamApplicationLogsAsync() {
+        return functionService.ping()
+                .flatMap(new Func1<Void, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Void aVoid) {
+                        return kuduClient.streamApplicationLogsAsync();
                     }
                 });
     }
@@ -298,7 +359,7 @@ class FunctionAppImpl
         Observable<Map<String, String>> getMasterKey(@Path("resourceGroupName") String resourceGroupName, @Path("name") String name, @Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Header("User-Agent") String userAgent);
     }
 
-    private interface FunctionKuduService {
+    private interface FunctionService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps listFunctionKeys" })
         @GET("admin/functions/{name}/keys")
         Observable<FunctionKeyListResult> listFunctionKeys(@Path("name") String functionName);
@@ -314,6 +375,10 @@ class FunctionAppImpl
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps deleteFunctionKey" })
         @DELETE("admin/functions/{name}/keys/{keyName}")
         Observable<Void> deleteFunctionKey(@Path("name") String functionName, @Path("keyName") String keyName);
+
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps ping" })
+        @POST("admin/host/ping")
+        Observable<Void> ping();
     }
 
     private static class FunctionKeyListResult {
@@ -321,12 +386,12 @@ class FunctionAppImpl
         private List<NameValuePair> keys;
     }
 
-    private static final class KuduCredentials extends TokenCredentials {
+    private static final class FunctionCredentials extends TokenCredentials {
         private String token;
         private long expire;
         private final FunctionAppImpl functionApp;
 
-        private KuduCredentials(FunctionAppImpl functionApp) {
+        private FunctionCredentials(FunctionAppImpl functionApp) {
             super("Bearer", null);
             this.functionApp = functionApp;
         }
@@ -343,6 +408,20 @@ class FunctionAppImpl
                 expire = Long.parseLong(matcher.group(1));
             }
             return token;
+        }
+    }
+
+    private static class PipedInputStreamWithCallback extends PipedInputStream {
+        private Action0 callback;
+
+        private void addCallback(Action0 action) {
+            this.callback = action;
+        }
+
+        @Override
+        public void close() throws IOException {
+            callback.call();
+            super.close();
         }
     }
 }
