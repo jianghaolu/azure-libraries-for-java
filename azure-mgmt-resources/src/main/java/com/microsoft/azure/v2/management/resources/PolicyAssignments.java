@@ -4,9 +4,9 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources;
+package com.microsoft.azure.v2.management.resources;
 
-import com.microsoft.azure.PagedList;
+import com.microsoft.azure.v2.PagedList;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.SupportsGettingById;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.SupportsListingByResourceGroup;

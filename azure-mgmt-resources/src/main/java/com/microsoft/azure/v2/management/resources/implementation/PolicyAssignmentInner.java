@@ -9,9 +9,8 @@
 package com.microsoft.azure.v2.management.resources.implementation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.azure.management.resources.PolicySku;
-import com.microsoft.rest.serializer.JsonFlatten;
-
+import com.microsoft.azure.v2.management.resources.PolicySku;
+import com.microsoft.rest.v2.serializer.JsonFlatten;
 import java.util.List;
 
 /**
@@ -148,7 +147,7 @@ public class PolicyAssignmentInner {
     /**
      * Get the notScopes value.
      *
-     * @return the notScopes value
+     * @return the notScopes value.
      */
     public List<String> notScopes() {
         return this.notScopes;
@@ -157,7 +156,7 @@ public class PolicyAssignmentInner {
     /**
      * Set the notScopes value.
      *
-     * @param notScopes the notScopes value to set
+     * @param notScopes the notScopes value to set.
      * @return the PolicyAssignmentInner object itself.
      */
     public PolicyAssignmentInner withNotScopes(List<String> notScopes) {
@@ -168,7 +167,7 @@ public class PolicyAssignmentInner {
     /**
      * Get the parameters value.
      *
-     * @return the parameters value
+     * @return the parameters value.
      */
     public Object parameters() {
         return this.parameters;
@@ -177,7 +176,7 @@ public class PolicyAssignmentInner {
     /**
      * Set the parameters value.
      *
-     * @param parameters the parameters value to set
+     * @param parameters the parameters value to set.
      * @return the PolicyAssignmentInner object itself.
      */
     public PolicyAssignmentInner withParameters(Object parameters) {
@@ -188,7 +187,7 @@ public class PolicyAssignmentInner {
     /**
      * Get the description value.
      *
-     * @return the description value
+     * @return the description value.
      */
     public String description() {
         return this.description;
@@ -197,7 +196,7 @@ public class PolicyAssignmentInner {
     /**
      * Set the description value.
      *
-     * @param description the description value to set
+     * @param description the description value to set.
      * @return the PolicyAssignmentInner object itself.
      */
     public PolicyAssignmentInner withDescription(String description) {
@@ -208,7 +207,7 @@ public class PolicyAssignmentInner {
     /**
      * Get the metadata value.
      *
-     * @return the metadata value
+     * @return the metadata value.
      */
     public Object metadata() {
         return this.metadata;
@@ -217,7 +216,7 @@ public class PolicyAssignmentInner {
     /**
      * Set the metadata value.
      *
-     * @param metadata the metadata value to set
+     * @param metadata the metadata value to set.
      * @return the PolicyAssignmentInner object itself.
      */
     public PolicyAssignmentInner withMetadata(Object metadata) {
@@ -228,7 +227,7 @@ public class PolicyAssignmentInner {
     /**
      * Get the id value.
      *
-     * @return the id value
+     * @return the id value.
      */
     public String id() {
         return this.id;
@@ -237,7 +236,7 @@ public class PolicyAssignmentInner {
     /**
      * Get the type value.
      *
-     * @return the type value
+     * @return the type value.
      */
     public String type() {
         return this.type;
@@ -255,7 +254,7 @@ public class PolicyAssignmentInner {
     /**
      * Get the sku value.
      *
-     * @return the sku value
+     * @return the sku value.
      */
     public PolicySku sku() {
         return this.sku;
@@ -264,7 +263,7 @@ public class PolicyAssignmentInner {
     /**
      * Set the sku value.
      *
-     * @param sku the sku value to set
+     * @param sku the sku value to set.
      * @return the PolicyAssignmentInner object itself.
      */
     public PolicyAssignmentInner withSku(PolicySku sku) {

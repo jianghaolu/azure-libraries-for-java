@@ -8,41 +8,36 @@
 
 package com.microsoft.azure.v2.management.resources.implementation;
 
-import com.google.common.reflect.TypeToken;
 import com.microsoft.azure.v2.AzureProxy;
 import com.microsoft.azure.v2.CloudException;
-import com.microsoft.azure.v2.ListOperationCallback;
 import com.microsoft.azure.v2.Page;
 import com.microsoft.azure.v2.PagedList;
-import com.microsoft.rest.v2.RestResponse;
+import com.microsoft.rest.v2.BodyResponse;
 import com.microsoft.rest.v2.ServiceCallback;
 import com.microsoft.rest.v2.ServiceFuture;
 import com.microsoft.rest.v2.Validator;
+import com.microsoft.rest.v2.VoidResponse;
 import com.microsoft.rest.v2.annotations.BodyParam;
 import com.microsoft.rest.v2.annotations.DELETE;
 import com.microsoft.rest.v2.annotations.ExpectedResponses;
 import com.microsoft.rest.v2.annotations.GET;
 import com.microsoft.rest.v2.annotations.HeaderParam;
-import com.microsoft.rest.v2.annotations.Headers;
 import com.microsoft.rest.v2.annotations.Host;
 import com.microsoft.rest.v2.annotations.PathParam;
 import com.microsoft.rest.v2.annotations.PUT;
 import com.microsoft.rest.v2.annotations.QueryParam;
 import com.microsoft.rest.v2.annotations.UnexpectedResponseExceptionType;
-import com.microsoft.rest.v2.http.HttpClient;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
-import java.io.IOException;
-import java.util.List;
+import io.reactivex.annotations.NonNull;
 
 /**
  * An instance of this class provides access to all the operations defined in
  * PolicyDefinitions.
  */
-public class PolicyDefinitionsInner {
+public final class PolicyDefinitionsInner {
     /**
      * The proxy service used to perform REST calls.
      */
@@ -68,31 +63,71 @@ public class PolicyDefinitionsInner {
      * by the proxy service to perform REST calls.
      */
     @Host("https://management.azure.com")
-    interface PolicyDefinitionsService {
-        @PUT("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policydefinitions/{policyDefinitionName}")
+    private interface PolicyDefinitionsService {
+        @PUT("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}")
         @ExpectedResponses({201})
         @UnexpectedResponseExceptionType(CloudException.class)
-        Single<RestResponse<Void, PolicyDefinitionInner>> createOrUpdate(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("subscriptionId") String subscriptionId, @BodyParam("application/json; charset=utf-8") PolicyDefinitionInner parameters, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+        Single<BodyResponse<PolicyDefinitionInner>> createOrUpdate(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("subscriptionId") String subscriptionId, @BodyParam("application/json; charset=utf-8") PolicyDefinitionInner parameters, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
 
-        @DELETE("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policydefinitions/{policyDefinitionName}")
+        @DELETE("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}")
         @ExpectedResponses({200, 204})
         @UnexpectedResponseExceptionType(CloudException.class)
-        Single<RestResponse<Void, Void>> delete(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("subscriptionId") String subscriptionId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+        Single<VoidResponse> delete(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("subscriptionId") String subscriptionId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
 
-        @GET("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policydefinitions/{policyDefinitionName}")
+        @GET("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}")
         @ExpectedResponses({200})
         @UnexpectedResponseExceptionType(CloudException.class)
-        Single<RestResponse<Void, PolicyDefinitionInner>> get(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("subscriptionId") String subscriptionId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+        Single<BodyResponse<PolicyDefinitionInner>> get(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("subscriptionId") String subscriptionId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
 
-        @GET("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policydefinitions")
+        @GET("providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}")
         @ExpectedResponses({200})
         @UnexpectedResponseExceptionType(CloudException.class)
-        Single<RestResponse<Void, PageImpl<PolicyDefinitionInner>>> list(@PathParam("subscriptionId") String subscriptionId, @QueryParam("$filter") String filter, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+        Single<BodyResponse<PolicyDefinitionInner>> getBuiltIn(@PathParam("policyDefinitionName") String policyDefinitionName, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+
+        @PUT("providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}")
+        @ExpectedResponses({201})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<BodyResponse<PolicyDefinitionInner>> createOrUpdateAtManagementGroup(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("managementGroupId") String managementGroupId, @BodyParam("application/json; charset=utf-8") PolicyDefinitionInner parameters, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+
+        @DELETE("providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}")
+        @ExpectedResponses({200, 204})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<VoidResponse> deleteAtManagementGroup(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("managementGroupId") String managementGroupId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+
+        @GET("providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<BodyResponse<PolicyDefinitionInner>> getAtManagementGroup(@PathParam("policyDefinitionName") String policyDefinitionName, @PathParam("managementGroupId") String managementGroupId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+
+        @GET("subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policyDefinitions")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<BodyResponse<PageImpl<PolicyDefinitionInner>>> list(@PathParam("subscriptionId") String subscriptionId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+
+        @GET("providers/Microsoft.Authorization/policyDefinitions")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<BodyResponse<PageImpl<PolicyDefinitionInner>>> listBuiltIn(@QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
+
+        @GET("providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<BodyResponse<PageImpl<PolicyDefinitionInner>>> listByManagementGroup(@PathParam("managementGroupId") String managementGroupId, @QueryParam("api-version") String apiVersion, @HeaderParam("accept-language") String acceptLanguage);
 
         @GET("{nextUrl}")
         @ExpectedResponses({200})
         @UnexpectedResponseExceptionType(CloudException.class)
-        Single<RestResponse<Void, PageImpl<PolicyDefinitionInner>>> listNext(@PathParam(value = "nextUrl", encoded = true) String nextUrl, @HeaderParam("accept-language") String acceptLanguage);
+        Single<BodyResponse<PageImpl<PolicyDefinitionInner>>> listNext(@PathParam(value = "nextUrl", encoded = true) String nextUrl, @HeaderParam("accept-language") String acceptLanguage);
+
+        @GET("{nextUrl}")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<BodyResponse<PageImpl<PolicyDefinitionInner>>> listBuiltInNext(@PathParam(value = "nextUrl", encoded = true) String nextUrl, @HeaderParam("accept-language") String acceptLanguage);
+
+        @GET("{nextUrl}")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CloudException.class)
+        Single<BodyResponse<PageImpl<PolicyDefinitionInner>>> listByManagementGroupNext(@PathParam(value = "nextUrl", encoded = true) String nextUrl, @HeaderParam("accept-language") String acceptLanguage);
     }
 
     /**
@@ -105,7 +140,7 @@ public class PolicyDefinitionsInner {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the PolicyDefinitionInner object if successful.
      */
-    public PolicyDefinitionInner createOrUpdate(String policyDefinitionName, PolicyDefinitionInner parameters) {
+    public PolicyDefinitionInner createOrUpdate(@NonNull String policyDefinitionName, @NonNull PolicyDefinitionInner parameters) {
         return createOrUpdateAsync(policyDefinitionName, parameters).blockingGet();
     }
 
@@ -116,9 +151,9 @@ public class PolicyDefinitionsInner {
      * @param parameters The policy definition properties.
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link ServiceFuture&lt;PolicyDefinitionInner&gt;} object.
+     * @return a ServiceFuture which will be completed with the result of the network request.
      */
-    public ServiceFuture<PolicyDefinitionInner> createOrUpdateAsync(String policyDefinitionName, PolicyDefinitionInner parameters, final ServiceCallback<PolicyDefinitionInner> serviceCallback) {
+    public ServiceFuture<PolicyDefinitionInner> createOrUpdateAsync(@NonNull String policyDefinitionName, @NonNull PolicyDefinitionInner parameters, ServiceCallback<PolicyDefinitionInner> serviceCallback) {
         return ServiceFuture.fromBody(createOrUpdateAsync(policyDefinitionName, parameters), serviceCallback);
     }
 
@@ -128,9 +163,9 @@ public class PolicyDefinitionsInner {
      * @param policyDefinitionName The name of the policy definition to create.
      * @param parameters The policy definition properties.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Single&lt;RestResponse&lt;Void, PolicyDefinitionInner&gt;&gt;} object if successful.
+     * @return a Single which performs the network request upon subscription.
      */
-    public Single<RestResponse<Void, PolicyDefinitionInner>> createOrUpdateWithRestResponseAsync(String policyDefinitionName, PolicyDefinitionInner parameters) {
+    public Single<BodyResponse<PolicyDefinitionInner>> createOrUpdateWithRestResponseAsync(@NonNull String policyDefinitionName, @NonNull PolicyDefinitionInner parameters) {
         if (policyDefinitionName == null) {
             throw new IllegalArgumentException("Parameter policyDefinitionName is required and cannot be null.");
         }
@@ -140,11 +175,9 @@ public class PolicyDefinitionsInner {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
         }
-        if (this.client.apiVersion() == null) {
-            throw new IllegalArgumentException("Parameter this.client.apiVersion() is required and cannot be null.");
-        }
         Validator.validate(parameters);
-        return service.createOrUpdate(policyDefinitionName, this.client.subscriptionId(), parameters, this.client.apiVersion(), this.client.acceptLanguage());
+        final String apiVersion = "2016-12-01";
+        return service.createOrUpdate(policyDefinitionName, this.client.subscriptionId(), parameters, apiVersion, this.client.acceptLanguage());
     }
 
     /**
@@ -153,19 +186,11 @@ public class PolicyDefinitionsInner {
      * @param policyDefinitionName The name of the policy definition to create.
      * @param parameters The policy definition properties.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Maybe&lt;PolicyDefinitionInner&gt;} object if successful.
+     * @return a Single which performs the network request upon subscription.
      */
-    public Maybe<PolicyDefinitionInner> createOrUpdateAsync(String policyDefinitionName, PolicyDefinitionInner parameters) {
+    public Maybe<PolicyDefinitionInner> createOrUpdateAsync(@NonNull String policyDefinitionName, @NonNull PolicyDefinitionInner parameters) {
         return createOrUpdateWithRestResponseAsync(policyDefinitionName, parameters)
-            .flatMapMaybe(new Function<RestResponse<Void, PolicyDefinitionInner>, Maybe<PolicyDefinitionInner>>() {
-                public Maybe<PolicyDefinitionInner> apply(RestResponse<Void, PolicyDefinitionInner> restResponse) {
-                    if (restResponse.body() == null) {
-                        return Maybe.empty();
-                    } else {
-                        return Maybe.just(restResponse.body());
-                    }
-                }
-            });
+            .flatMapMaybe((BodyResponse<PolicyDefinitionInner> res) -> res.body() == null ? Maybe.empty() : Maybe.just(res.body()));
     }
 
     /**
@@ -176,7 +201,7 @@ public class PolicyDefinitionsInner {
      * @throws CloudException thrown if the request is rejected by server.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    public void delete(String policyDefinitionName) {
+    public void delete(@NonNull String policyDefinitionName) {
         deleteAsync(policyDefinitionName).blockingAwait();
     }
 
@@ -186,9 +211,9 @@ public class PolicyDefinitionsInner {
      * @param policyDefinitionName The name of the policy definition to delete.
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link ServiceFuture&lt;Void&gt;} object.
+     * @return a ServiceFuture which will be completed with the result of the network request.
      */
-    public ServiceFuture<Void> deleteAsync(String policyDefinitionName, final ServiceCallback<Void> serviceCallback) {
+    public ServiceFuture<Void> deleteAsync(@NonNull String policyDefinitionName, ServiceCallback<Void> serviceCallback) {
         return ServiceFuture.fromBody(deleteAsync(policyDefinitionName), serviceCallback);
     }
 
@@ -197,19 +222,17 @@ public class PolicyDefinitionsInner {
      *
      * @param policyDefinitionName The name of the policy definition to delete.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Single&lt;RestResponse&lt;Void, Void&gt;&gt;} object if successful.
+     * @return a Single which performs the network request upon subscription.
      */
-    public Single<RestResponse<Void, Void>> deleteWithRestResponseAsync(String policyDefinitionName) {
+    public Single<VoidResponse> deleteWithRestResponseAsync(@NonNull String policyDefinitionName) {
         if (policyDefinitionName == null) {
             throw new IllegalArgumentException("Parameter policyDefinitionName is required and cannot be null.");
         }
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        if (this.client.apiVersion() == null) {
-            throw new IllegalArgumentException("Parameter this.client.apiVersion() is required and cannot be null.");
-        }
-        return service.delete(policyDefinitionName, this.client.subscriptionId(), this.client.apiVersion(), this.client.acceptLanguage());
+        final String apiVersion = "2016-12-01";
+        return service.delete(policyDefinitionName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage());
     }
 
     /**
@@ -217,9 +240,9 @@ public class PolicyDefinitionsInner {
      *
      * @param policyDefinitionName The name of the policy definition to delete.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Completable} object if successful.
+     * @return a Single which performs the network request upon subscription.
      */
-    public Completable deleteAsync(String policyDefinitionName) {
+    public Completable deleteAsync(@NonNull String policyDefinitionName) {
         return deleteWithRestResponseAsync(policyDefinitionName)
             .toCompletable();
     }
@@ -233,7 +256,7 @@ public class PolicyDefinitionsInner {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the PolicyDefinitionInner object if successful.
      */
-    public PolicyDefinitionInner get(String policyDefinitionName) {
+    public PolicyDefinitionInner get(@NonNull String policyDefinitionName) {
         return getAsync(policyDefinitionName).blockingGet();
     }
 
@@ -243,9 +266,9 @@ public class PolicyDefinitionsInner {
      * @param policyDefinitionName The name of the policy definition to get.
      * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link ServiceFuture&lt;PolicyDefinitionInner&gt;} object.
+     * @return a ServiceFuture which will be completed with the result of the network request.
      */
-    public ServiceFuture<PolicyDefinitionInner> getAsync(String policyDefinitionName, final ServiceCallback<PolicyDefinitionInner> serviceCallback) {
+    public ServiceFuture<PolicyDefinitionInner> getAsync(@NonNull String policyDefinitionName, ServiceCallback<PolicyDefinitionInner> serviceCallback) {
         return ServiceFuture.fromBody(getAsync(policyDefinitionName), serviceCallback);
     }
 
@@ -254,19 +277,17 @@ public class PolicyDefinitionsInner {
      *
      * @param policyDefinitionName The name of the policy definition to get.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Single&lt;RestResponse&lt;Void, PolicyDefinitionInner&gt;&gt;} object if successful.
+     * @return a Single which performs the network request upon subscription.
      */
-    public Single<RestResponse<Void, PolicyDefinitionInner>> getWithRestResponseAsync(String policyDefinitionName) {
+    public Single<BodyResponse<PolicyDefinitionInner>> getWithRestResponseAsync(@NonNull String policyDefinitionName) {
         if (policyDefinitionName == null) {
             throw new IllegalArgumentException("Parameter policyDefinitionName is required and cannot be null.");
         }
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        if (this.client.apiVersion() == null) {
-            throw new IllegalArgumentException("Parameter this.client.apiVersion() is required and cannot be null.");
-        }
-        return service.get(policyDefinitionName, this.client.subscriptionId(), this.client.apiVersion(), this.client.acceptLanguage());
+        final String apiVersion = "2016-12-01";
+        return service.get(policyDefinitionName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage());
     }
 
     /**
@@ -274,25 +295,252 @@ public class PolicyDefinitionsInner {
      *
      * @param policyDefinitionName The name of the policy definition to get.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Maybe&lt;PolicyDefinitionInner&gt;} object if successful.
+     * @return a Single which performs the network request upon subscription.
      */
-    public Maybe<PolicyDefinitionInner> getAsync(String policyDefinitionName) {
+    public Maybe<PolicyDefinitionInner> getAsync(@NonNull String policyDefinitionName) {
         return getWithRestResponseAsync(policyDefinitionName)
-            .flatMapMaybe(new Function<RestResponse<Void, PolicyDefinitionInner>, Maybe<PolicyDefinitionInner>>() {
-                public Maybe<PolicyDefinitionInner> apply(RestResponse<Void, PolicyDefinitionInner> restResponse) {
-                    if (restResponse.body() == null) {
-                        return Maybe.empty();
-                    } else {
-                        return Maybe.just(restResponse.body());
-                    }
-                }
-            });
+            .flatMapMaybe((BodyResponse<PolicyDefinitionInner> res) -> res.body() == null ? Maybe.empty() : Maybe.just(res.body()));
+    }
+
+    /**
+     * Gets the built in policy definition.
+     *
+     * @param policyDefinitionName The name of the built in policy definition to get.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CloudException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the PolicyDefinitionInner object if successful.
+     */
+    public PolicyDefinitionInner getBuiltIn(@NonNull String policyDefinitionName) {
+        return getBuiltInAsync(policyDefinitionName).blockingGet();
+    }
+
+    /**
+     * Gets the built in policy definition.
+     *
+     * @param policyDefinitionName The name of the built in policy definition to get.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a ServiceFuture which will be completed with the result of the network request.
+     */
+    public ServiceFuture<PolicyDefinitionInner> getBuiltInAsync(@NonNull String policyDefinitionName, ServiceCallback<PolicyDefinitionInner> serviceCallback) {
+        return ServiceFuture.fromBody(getBuiltInAsync(policyDefinitionName), serviceCallback);
+    }
+
+    /**
+     * Gets the built in policy definition.
+     *
+     * @param policyDefinitionName The name of the built in policy definition to get.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Single<BodyResponse<PolicyDefinitionInner>> getBuiltInWithRestResponseAsync(@NonNull String policyDefinitionName) {
+        if (policyDefinitionName == null) {
+            throw new IllegalArgumentException("Parameter policyDefinitionName is required and cannot be null.");
+        }
+        final String apiVersion = "2016-12-01";
+        return service.getBuiltIn(policyDefinitionName, apiVersion, this.client.acceptLanguage());
+    }
+
+    /**
+     * Gets the built in policy definition.
+     *
+     * @param policyDefinitionName The name of the built in policy definition to get.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Maybe<PolicyDefinitionInner> getBuiltInAsync(@NonNull String policyDefinitionName) {
+        return getBuiltInWithRestResponseAsync(policyDefinitionName)
+            .flatMapMaybe((BodyResponse<PolicyDefinitionInner> res) -> res.body() == null ? Maybe.empty() : Maybe.just(res.body()));
+    }
+
+    /**
+     * Creates or updates a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to create.
+     * @param managementGroupId The ID of the management group.
+     * @param parameters The policy definition properties.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CloudException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the PolicyDefinitionInner object if successful.
+     */
+    public PolicyDefinitionInner createOrUpdateAtManagementGroup(@NonNull String policyDefinitionName, @NonNull String managementGroupId, @NonNull PolicyDefinitionInner parameters) {
+        return createOrUpdateAtManagementGroupAsync(policyDefinitionName, managementGroupId, parameters).blockingGet();
+    }
+
+    /**
+     * Creates or updates a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to create.
+     * @param managementGroupId The ID of the management group.
+     * @param parameters The policy definition properties.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a ServiceFuture which will be completed with the result of the network request.
+     */
+    public ServiceFuture<PolicyDefinitionInner> createOrUpdateAtManagementGroupAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId, @NonNull PolicyDefinitionInner parameters, ServiceCallback<PolicyDefinitionInner> serviceCallback) {
+        return ServiceFuture.fromBody(createOrUpdateAtManagementGroupAsync(policyDefinitionName, managementGroupId, parameters), serviceCallback);
+    }
+
+    /**
+     * Creates or updates a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to create.
+     * @param managementGroupId The ID of the management group.
+     * @param parameters The policy definition properties.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Single<BodyResponse<PolicyDefinitionInner>> createOrUpdateAtManagementGroupWithRestResponseAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId, @NonNull PolicyDefinitionInner parameters) {
+        if (policyDefinitionName == null) {
+            throw new IllegalArgumentException("Parameter policyDefinitionName is required and cannot be null.");
+        }
+        if (managementGroupId == null) {
+            throw new IllegalArgumentException("Parameter managementGroupId is required and cannot be null.");
+        }
+        if (parameters == null) {
+            throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
+        }
+        Validator.validate(parameters);
+        final String apiVersion = "2016-12-01";
+        return service.createOrUpdateAtManagementGroup(policyDefinitionName, managementGroupId, parameters, apiVersion, this.client.acceptLanguage());
+    }
+
+    /**
+     * Creates or updates a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to create.
+     * @param managementGroupId The ID of the management group.
+     * @param parameters The policy definition properties.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Maybe<PolicyDefinitionInner> createOrUpdateAtManagementGroupAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId, @NonNull PolicyDefinitionInner parameters) {
+        return createOrUpdateAtManagementGroupWithRestResponseAsync(policyDefinitionName, managementGroupId, parameters)
+            .flatMapMaybe((BodyResponse<PolicyDefinitionInner> res) -> res.body() == null ? Maybe.empty() : Maybe.just(res.body()));
+    }
+
+    /**
+     * Deletes a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to delete.
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CloudException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     */
+    public void deleteAtManagementGroup(@NonNull String policyDefinitionName, @NonNull String managementGroupId) {
+        deleteAtManagementGroupAsync(policyDefinitionName, managementGroupId).blockingAwait();
+    }
+
+    /**
+     * Deletes a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to delete.
+     * @param managementGroupId The ID of the management group.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a ServiceFuture which will be completed with the result of the network request.
+     */
+    public ServiceFuture<Void> deleteAtManagementGroupAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId, ServiceCallback<Void> serviceCallback) {
+        return ServiceFuture.fromBody(deleteAtManagementGroupAsync(policyDefinitionName, managementGroupId), serviceCallback);
+    }
+
+    /**
+     * Deletes a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to delete.
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Single<VoidResponse> deleteAtManagementGroupWithRestResponseAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId) {
+        if (policyDefinitionName == null) {
+            throw new IllegalArgumentException("Parameter policyDefinitionName is required and cannot be null.");
+        }
+        if (managementGroupId == null) {
+            throw new IllegalArgumentException("Parameter managementGroupId is required and cannot be null.");
+        }
+        final String apiVersion = "2016-12-01";
+        return service.deleteAtManagementGroup(policyDefinitionName, managementGroupId, apiVersion, this.client.acceptLanguage());
+    }
+
+    /**
+     * Deletes a policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to delete.
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Completable deleteAtManagementGroupAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId) {
+        return deleteAtManagementGroupWithRestResponseAsync(policyDefinitionName, managementGroupId)
+            .toCompletable();
+    }
+
+    /**
+     * Gets the policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to get.
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CloudException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the PolicyDefinitionInner object if successful.
+     */
+    public PolicyDefinitionInner getAtManagementGroup(@NonNull String policyDefinitionName, @NonNull String managementGroupId) {
+        return getAtManagementGroupAsync(policyDefinitionName, managementGroupId).blockingGet();
+    }
+
+    /**
+     * Gets the policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to get.
+     * @param managementGroupId The ID of the management group.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a ServiceFuture which will be completed with the result of the network request.
+     */
+    public ServiceFuture<PolicyDefinitionInner> getAtManagementGroupAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId, ServiceCallback<PolicyDefinitionInner> serviceCallback) {
+        return ServiceFuture.fromBody(getAtManagementGroupAsync(policyDefinitionName, managementGroupId), serviceCallback);
+    }
+
+    /**
+     * Gets the policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to get.
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Single<BodyResponse<PolicyDefinitionInner>> getAtManagementGroupWithRestResponseAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId) {
+        if (policyDefinitionName == null) {
+            throw new IllegalArgumentException("Parameter policyDefinitionName is required and cannot be null.");
+        }
+        if (managementGroupId == null) {
+            throw new IllegalArgumentException("Parameter managementGroupId is required and cannot be null.");
+        }
+        final String apiVersion = "2016-12-01";
+        return service.getAtManagementGroup(policyDefinitionName, managementGroupId, apiVersion, this.client.acceptLanguage());
+    }
+
+    /**
+     * Gets the policy definition at management group level.
+     *
+     * @param policyDefinitionName The name of the policy definition to get.
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return a Single which performs the network request upon subscription.
+     */
+    public Maybe<PolicyDefinitionInner> getAtManagementGroupAsync(@NonNull String policyDefinitionName, @NonNull String managementGroupId) {
+        return getAtManagementGroupWithRestResponseAsync(policyDefinitionName, managementGroupId)
+            .flatMapMaybe((BodyResponse<PolicyDefinitionInner> res) -> res.body() == null ? Maybe.empty() : Maybe.just(res.body()));
     }
 
     /**
      * Gets all the policy definitions for a subscription.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CloudException thrown if the request is rejected by server.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the PagedList&lt;PolicyDefinitionInner&gt; object if successful.
@@ -310,107 +558,131 @@ public class PolicyDefinitionsInner {
     /**
      * Gets all the policy definitions for a subscription.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @return the observable to the PagedList&lt;PolicyDefinitionInner&gt; object.
      */
     public Observable<Page<PolicyDefinitionInner>> listAsync() {
         return listSinglePageAsync()
             .toObservable()
-            .concatMap(new Function<Page<PolicyDefinitionInner>, Observable<Page<PolicyDefinitionInner>>>() {
-                @Override
-                public Observable<Page<PolicyDefinitionInner>> apply(Page<PolicyDefinitionInner> page) {
-                    String nextPageLink = page.nextPageLink();
-                    if (nextPageLink == null) {
-                        return Observable.just(page);
-                    }
-                    return Observable.just(page).concatWith(listNextAsync(nextPageLink));
+            .concatMap((Page<PolicyDefinitionInner> page) -> {
+                String nextPageLink = page.nextPageLink();
+                if (nextPageLink == null) {
+                    return Observable.just(page);
                 }
+                return Observable.just(page).concatWith(listNextAsync(nextPageLink));
             });
     }
 
     /**
      * Gets all the policy definitions for a subscription.
      *
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt;} object if successful.
+     * @return the Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt; object if successful.
      */
     public Single<Page<PolicyDefinitionInner>> listSinglePageAsync() {
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        if (this.client.apiVersion() == null) {
-            throw new IllegalArgumentException("Parameter this.client.apiVersion() is required and cannot be null.");
-        }
-        final String filter = null;
-        return service.list(this.client.subscriptionId(), filter, this.client.apiVersion(), this.client.acceptLanguage()).map(new Function<RestResponse<Void, PageImpl<PolicyDefinitionInner>>, Page<PolicyDefinitionInner>>() {
-            @Override
-            public Page<PolicyDefinitionInner> apply(RestResponse<Void, PageImpl<PolicyDefinitionInner>> response) {
-                return response.body();
-            }
-        });
+        final String apiVersion = "2016-12-01";
+        return service.list(this.client.subscriptionId(), apiVersion, this.client.acceptLanguage())
+            .map((BodyResponse<PageImpl<PolicyDefinitionInner>> res) -> res.body());
     }
 
     /**
-     * Gets all the policy definitions for a subscription.
+     * Gets all the built in policy definitions.
      *
-     * @param filter The filter to apply on the operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CloudException thrown if the request is rejected by server.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the PagedList&lt;PolicyDefinitionInner&gt; object if successful.
      */
-    public PagedList<PolicyDefinitionInner> list(final String filter) {
-        Page<PolicyDefinitionInner> response = listSinglePageAsync(filter).blockingGet();
+    public PagedList<PolicyDefinitionInner> listBuiltIn() {
+        Page<PolicyDefinitionInner> response = listBuiltInSinglePageAsync().blockingGet();
         return new PagedList<PolicyDefinitionInner>(response) {
             @Override
             public Page<PolicyDefinitionInner> nextPage(String nextPageLink) {
-                return listNextSinglePageAsync(nextPageLink).blockingGet();
+                return listBuiltInNextSinglePageAsync(nextPageLink).blockingGet();
             }
         };
     }
 
     /**
-     * Gets all the policy definitions for a subscription.
+     * Gets all the built in policy definitions.
      *
-     * @param filter The filter to apply on the operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @return the observable to the PagedList&lt;PolicyDefinitionInner&gt; object.
      */
-    public Observable<Page<PolicyDefinitionInner>> listAsync(final String filter) {
-        return listSinglePageAsync(filter)
+    public Observable<Page<PolicyDefinitionInner>> listBuiltInAsync() {
+        return listBuiltInSinglePageAsync()
             .toObservable()
-            .concatMap(new Function<Page<PolicyDefinitionInner>, Observable<Page<PolicyDefinitionInner>>>() {
-                @Override
-                public Observable<Page<PolicyDefinitionInner>> apply(Page<PolicyDefinitionInner> page) {
-                    String nextPageLink = page.nextPageLink();
-                    if (nextPageLink == null) {
-                        return Observable.just(page);
-                    }
-                    return Observable.just(page).concatWith(listNextAsync(nextPageLink));
+            .concatMap((Page<PolicyDefinitionInner> page) -> {
+                String nextPageLink = page.nextPageLink();
+                if (nextPageLink == null) {
+                    return Observable.just(page);
                 }
+                return Observable.just(page).concatWith(listBuiltInNextAsync(nextPageLink));
             });
     }
 
     /**
-     * Gets all the policy definitions for a subscription.
+     * Gets all the built in policy definitions.
      *
-     * @param filter The filter to apply on the operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt;} object if successful.
+     * @return the Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt; object if successful.
      */
-    public Single<Page<PolicyDefinitionInner>> listSinglePageAsync(final String filter) {
-        if (this.client.subscriptionId() == null) {
-            throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
-        }
-        if (this.client.apiVersion() == null) {
-            throw new IllegalArgumentException("Parameter this.client.apiVersion() is required and cannot be null.");
-        }
-        return service.list(this.client.subscriptionId(), filter, this.client.apiVersion(), this.client.acceptLanguage()).map(new Function<RestResponse<Void, PageImpl<PolicyDefinitionInner>>, Page<PolicyDefinitionInner>>() {
+    public Single<Page<PolicyDefinitionInner>> listBuiltInSinglePageAsync() {
+        final String apiVersion = "2016-12-01";
+        return service.listBuiltIn(apiVersion, this.client.acceptLanguage())
+            .map((BodyResponse<PageImpl<PolicyDefinitionInner>> res) -> res.body());
+    }
+
+    /**
+     * Gets all the policy definitions for a subscription at management group level.
+     *
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CloudException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the PagedList&lt;PolicyDefinitionInner&gt; object if successful.
+     */
+    public PagedList<PolicyDefinitionInner> listByManagementGroup(@NonNull String managementGroupId) {
+        Page<PolicyDefinitionInner> response = listByManagementGroupSinglePageAsync(managementGroupId).blockingGet();
+        return new PagedList<PolicyDefinitionInner>(response) {
             @Override
-            public Page<PolicyDefinitionInner> apply(RestResponse<Void, PageImpl<PolicyDefinitionInner>> response) {
-                return response.body();
+            public Page<PolicyDefinitionInner> nextPage(String nextPageLink) {
+                return listByManagementGroupNextSinglePageAsync(nextPageLink).blockingGet();
             }
-        });
+        };
+    }
+
+    /**
+     * Gets all the policy definitions for a subscription at management group level.
+     *
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return the observable to the PagedList&lt;PolicyDefinitionInner&gt; object.
+     */
+    public Observable<Page<PolicyDefinitionInner>> listByManagementGroupAsync(@NonNull String managementGroupId) {
+        return listByManagementGroupSinglePageAsync(managementGroupId)
+            .toObservable()
+            .concatMap((Page<PolicyDefinitionInner> page) -> {
+                String nextPageLink = page.nextPageLink();
+                if (nextPageLink == null) {
+                    return Observable.just(page);
+                }
+                return Observable.just(page).concatWith(listByManagementGroupNextAsync(nextPageLink));
+            });
+    }
+
+    /**
+     * Gets all the policy definitions for a subscription at management group level.
+     *
+     * @param managementGroupId The ID of the management group.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return the Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt; object if successful.
+     */
+    public Single<Page<PolicyDefinitionInner>> listByManagementGroupSinglePageAsync(@NonNull String managementGroupId) {
+        if (managementGroupId == null) {
+            throw new IllegalArgumentException("Parameter managementGroupId is required and cannot be null.");
+        }
+        final String apiVersion = "2016-12-01";
+        return service.listByManagementGroup(managementGroupId, apiVersion, this.client.acceptLanguage())
+            .map((BodyResponse<PageImpl<PolicyDefinitionInner>> res) -> res.body());
     }
 
     /**
@@ -422,7 +694,7 @@ public class PolicyDefinitionsInner {
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the PagedList&lt;PolicyDefinitionInner&gt; object if successful.
      */
-    public PagedList<PolicyDefinitionInner> listNext(final String nextPageLink) {
+    public PagedList<PolicyDefinitionInner> listNext(@NonNull String nextPageLink) {
         Page<PolicyDefinitionInner> response = listNextSinglePageAsync(nextPageLink).blockingGet();
         return new PagedList<PolicyDefinitionInner>(response) {
             @Override
@@ -439,18 +711,15 @@ public class PolicyDefinitionsInner {
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @return the observable to the PagedList&lt;PolicyDefinitionInner&gt; object.
      */
-    public Observable<Page<PolicyDefinitionInner>> listNextAsync(final String nextPageLink) {
+    public Observable<Page<PolicyDefinitionInner>> listNextAsync(@NonNull String nextPageLink) {
         return listNextSinglePageAsync(nextPageLink)
             .toObservable()
-            .concatMap(new Function<Page<PolicyDefinitionInner>, Observable<Page<PolicyDefinitionInner>>>() {
-                @Override
-                public Observable<Page<PolicyDefinitionInner>> apply(Page<PolicyDefinitionInner> page) {
-                    String nextPageLink = page.nextPageLink();
-                    if (nextPageLink == null) {
-                        return Observable.just(page);
-                    }
-                    return Observable.just(page).concatWith(listNextAsync(nextPageLink));
+            .concatMap((Page<PolicyDefinitionInner> page) -> {
+                String nextPageLink1 = page.nextPageLink();
+                if (nextPageLink1 == null) {
+                    return Observable.just(page);
                 }
+                return Observable.just(page).concatWith(listNextAsync(nextPageLink1));
             });
     }
 
@@ -459,18 +728,122 @@ public class PolicyDefinitionsInner {
      *
      * @param nextPageLink The NextLink from the previous successful call to List operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @return the {@link Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt;} object if successful.
+     * @return the Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt; object if successful.
      */
-    public Single<Page<PolicyDefinitionInner>> listNextSinglePageAsync(final String nextPageLink) {
+    public Single<Page<PolicyDefinitionInner>> listNextSinglePageAsync(@NonNull String nextPageLink) {
         if (nextPageLink == null) {
             throw new IllegalArgumentException("Parameter nextPageLink is required and cannot be null.");
         }
         String nextUrl = String.format("%s", nextPageLink);
-        return service.listNext(nextUrl, this.client.acceptLanguage()).map(new Function<RestResponse<Void, PageImpl<PolicyDefinitionInner>>, Page<PolicyDefinitionInner>>() {
+        return service.listNext(nextUrl, this.client.acceptLanguage())
+            .map((BodyResponse<PageImpl<PolicyDefinitionInner>> res) -> res.body());
+    }
+
+    /**
+     * Gets all the built in policy definitions.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CloudException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the PagedList&lt;PolicyDefinitionInner&gt; object if successful.
+     */
+    public PagedList<PolicyDefinitionInner> listBuiltInNext(@NonNull String nextPageLink) {
+        Page<PolicyDefinitionInner> response = listBuiltInNextSinglePageAsync(nextPageLink).blockingGet();
+        return new PagedList<PolicyDefinitionInner>(response) {
             @Override
-            public Page<PolicyDefinitionInner> apply(RestResponse<Void, PageImpl<PolicyDefinitionInner>> response) {
-                return response.body();
+            public Page<PolicyDefinitionInner> nextPage(String nextPageLink) {
+                return listBuiltInNextSinglePageAsync(nextPageLink).blockingGet();
             }
-        });
+        };
+    }
+
+    /**
+     * Gets all the built in policy definitions.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return the observable to the PagedList&lt;PolicyDefinitionInner&gt; object.
+     */
+    public Observable<Page<PolicyDefinitionInner>> listBuiltInNextAsync(@NonNull String nextPageLink) {
+        return listBuiltInNextSinglePageAsync(nextPageLink)
+            .toObservable()
+            .concatMap((Page<PolicyDefinitionInner> page) -> {
+                String nextPageLink1 = page.nextPageLink();
+                if (nextPageLink1 == null) {
+                    return Observable.just(page);
+                }
+                return Observable.just(page).concatWith(listBuiltInNextAsync(nextPageLink1));
+            });
+    }
+
+    /**
+     * Gets all the built in policy definitions.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return the Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt; object if successful.
+     */
+    public Single<Page<PolicyDefinitionInner>> listBuiltInNextSinglePageAsync(@NonNull String nextPageLink) {
+        if (nextPageLink == null) {
+            throw new IllegalArgumentException("Parameter nextPageLink is required and cannot be null.");
+        }
+        String nextUrl = String.format("%s", nextPageLink);
+        return service.listBuiltInNext(nextUrl, this.client.acceptLanguage())
+            .map((BodyResponse<PageImpl<PolicyDefinitionInner>> res) -> res.body());
+    }
+
+    /**
+     * Gets all the policy definitions for a subscription at management group level.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CloudException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the PagedList&lt;PolicyDefinitionInner&gt; object if successful.
+     */
+    public PagedList<PolicyDefinitionInner> listByManagementGroupNext(@NonNull String nextPageLink) {
+        Page<PolicyDefinitionInner> response = listByManagementGroupNextSinglePageAsync(nextPageLink).blockingGet();
+        return new PagedList<PolicyDefinitionInner>(response) {
+            @Override
+            public Page<PolicyDefinitionInner> nextPage(String nextPageLink) {
+                return listByManagementGroupNextSinglePageAsync(nextPageLink).blockingGet();
+            }
+        };
+    }
+
+    /**
+     * Gets all the policy definitions for a subscription at management group level.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return the observable to the PagedList&lt;PolicyDefinitionInner&gt; object.
+     */
+    public Observable<Page<PolicyDefinitionInner>> listByManagementGroupNextAsync(@NonNull String nextPageLink) {
+        return listByManagementGroupNextSinglePageAsync(nextPageLink)
+            .toObservable()
+            .concatMap((Page<PolicyDefinitionInner> page) -> {
+                String nextPageLink1 = page.nextPageLink();
+                if (nextPageLink1 == null) {
+                    return Observable.just(page);
+                }
+                return Observable.just(page).concatWith(listByManagementGroupNextAsync(nextPageLink1));
+            });
+    }
+
+    /**
+     * Gets all the policy definitions for a subscription at management group level.
+     *
+     * @param nextPageLink The NextLink from the previous successful call to List operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @return the Single&lt;Page&lt;PolicyDefinitionInner&gt;&gt; object if successful.
+     */
+    public Single<Page<PolicyDefinitionInner>> listByManagementGroupNextSinglePageAsync(@NonNull String nextPageLink) {
+        if (nextPageLink == null) {
+            throw new IllegalArgumentException("Parameter nextPageLink is required and cannot be null.");
+        }
+        String nextUrl = String.format("%s", nextPageLink);
+        return service.listByManagementGroupNext(nextUrl, this.client.acceptLanguage())
+            .map((BodyResponse<PageImpl<PolicyDefinitionInner>> res) -> res.body());
     }
 }

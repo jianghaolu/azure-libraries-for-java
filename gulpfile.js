@@ -108,7 +108,7 @@ var codegen = function(project, cb) {
     }
 
     console.log('Generating "' + project + '" from spec file ' + specRoot + '/' + mappings[project].source);
-    var generator = '--fluent';
+    var generator = '--fluent=true';
     if (mappings[project].fluent !== null && mappings[project].fluent === false) {
         generator = '';
     }
@@ -123,9 +123,9 @@ var codegen = function(project, cb) {
     // path.join won't work if specRoot is a URL
     cmd = autoRestExe + ' ' + specRoot + "/" + mappings[project].source +
                         ' --java ' +
-                        ' --azure-arm ' +
+                        ' --azure-arm=true ' +
                         generator +
-                        ` --namespace=${mappings[project].package} ` +
+                        ` --java.namespace=${mappings[project].package} ` +
                         ` --java.output-folder=${outDir} ` +
                         ` --license-header=MICROSOFT_MIT_NO_CODEGEN ` +
                         generatorPath +

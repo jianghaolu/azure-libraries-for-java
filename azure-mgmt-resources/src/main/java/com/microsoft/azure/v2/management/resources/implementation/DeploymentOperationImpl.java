@@ -4,14 +4,15 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources.implementation;
+package com.microsoft.azure.v2.management.resources.implementation;
 
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.model.implementation.IndexableRefreshableWrapperImpl;
-import com.microsoft.azure.management.resources.DeploymentOperation;
-import com.microsoft.azure.management.resources.TargetResource;
-import org.joda.time.DateTime;
-import rx.Observable;
+import com.microsoft.azure.v2.management.resources.DeploymentOperation;
+import com.microsoft.azure.v2.management.resources.TargetResource;
+import io.reactivex.Maybe;
+
+import java.time.OffsetDateTime;
 
 /**
  * The implementation of {@link DeploymentOperation}.
@@ -46,7 +47,7 @@ final class DeploymentOperationImpl extends
     }
 
     @Override
-    public DateTime timestamp() {
+    public OffsetDateTime timestamp() {
         if (this.inner().properties() == null) {
             return null;
         }
@@ -78,7 +79,7 @@ final class DeploymentOperationImpl extends
     }
 
     @Override
-    protected Observable<DeploymentOperationInner> getInnerAsync() {
+    protected Maybe<DeploymentOperationInner> getInnerAsync() {
         return client.getAsync(resourceGroupName, deploymentName, operationId());
     }
 }

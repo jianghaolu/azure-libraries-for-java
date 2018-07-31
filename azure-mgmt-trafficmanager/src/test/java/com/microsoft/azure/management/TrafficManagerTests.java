@@ -9,7 +9,7 @@ package com.microsoft.azure.management;
 import com.microsoft.azure.management.resources.core.TestBase;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
 import com.microsoft.azure.management.trafficmanager.GeographicLocation;
 import com.microsoft.azure.management.trafficmanager.TrafficManagerExternalEndpoint;
 import com.microsoft.azure.management.trafficmanager.TrafficManagerProfile;

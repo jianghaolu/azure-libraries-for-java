@@ -7,7 +7,7 @@ package com.microsoft.azure.management.batch;
 
 import com.microsoft.azure.management.batch.implementation.BatchManager;
 import com.microsoft.azure.management.resources.core.TestBase;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
 import com.microsoft.rest.RestClient;
 
 public abstract class BatchManagementTest extends TestBase {

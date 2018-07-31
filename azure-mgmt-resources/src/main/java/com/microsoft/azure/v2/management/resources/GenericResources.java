@@ -4,7 +4,7 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources;
+package com.microsoft.azure.v2.management.resources;
 
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.SupportsGettingById;
@@ -14,10 +14,10 @@ import com.microsoft.azure.management.resources.fluentcore.arm.models.HasManager
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCreating;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsDeletingById;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsListing;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
-import rx.Completable;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
+import com.microsoft.rest.v2.ServiceCallback;
+import com.microsoft.rest.v2.ServiceFuture;
+import io.reactivex.Completable;
 
 import java.util.List;
 

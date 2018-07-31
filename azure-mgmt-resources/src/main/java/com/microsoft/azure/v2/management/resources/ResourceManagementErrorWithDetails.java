@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * The detailed error message of resource management.
  */
-public class ResourceManagementErrorWithDetails {
+public final class ResourceManagementErrorWithDetails {
     /**
      * The error code returned when exporting the template.
      */

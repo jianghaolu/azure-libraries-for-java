@@ -12,7 +12,7 @@ import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.management.resources.ResourceGroup;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
 import org.joda.time.Duration;
 import org.junit.Assert;
 import org.junit.Ignore;

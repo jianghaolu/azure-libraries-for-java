@@ -4,16 +4,18 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources.implementation;
+package com.microsoft.azure.v2.management.resources.implementation;
 
-import com.microsoft.azure.management.resources.ResourceGroup;
-import com.microsoft.azure.management.resources.ResourceGroupExportResult;
 import com.microsoft.azure.management.resources.ResourceGroupExportTemplateOptions;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.model.implementation.CreatableUpdatableImpl;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
-import rx.Observable;
+import com.microsoft.azure.v2.management.resources.ExportTemplateRequest;
+import com.microsoft.azure.v2.management.resources.ResourceGroup;
+import com.microsoft.azure.v2.management.resources.ResourceGroupExportResult;
+import com.microsoft.rest.v2.ServiceCallback;
+import com.microsoft.rest.v2.ServiceFuture;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import rx.functions.Func1;
 
 import java.util.Arrays;
@@ -79,20 +81,15 @@ class ResourceGroupImpl extends
 
     @Override
     public ResourceGroupExportResult exportTemplate(ResourceGroupExportTemplateOptions options) {
-        return this.exportTemplateAsync(options).toBlocking().last();
+        return this.exportTemplateAsync(options).blockingGet();
     }
 
     @Override
-    public Observable<ResourceGroupExportResult> exportTemplateAsync(ResourceGroupExportTemplateOptions options) {
-        ExportTemplateRequestInner inner = new ExportTemplateRequestInner()
+    public Maybe<ResourceGroupExportResult> exportTemplateAsync(ResourceGroupExportTemplateOptions options) {
+        ExportTemplateRequest inner = new ExportTemplateRequest()
                 .withResources(Arrays.asList("*"))
                 .withOptions(options.toString());
-        return client.exportTemplateAsync(name(), inner).map(new Func1<ResourceGroupExportResultInner, ResourceGroupExportResult>() {
-            @Override
-            public ResourceGroupExportResult call(ResourceGroupExportResultInner resourceGroupExportResultInner) {
-                return new ResourceGroupExportResultImpl(resourceGroupExportResultInner);
-            }
-        });
+        return client.exportTemplateAsync(name(), inner).map(ResourceGroupExportResultImpl::new);
     }
 
     @Override
@@ -138,6 +135,7 @@ class ResourceGroupImpl extends
         params.withLocation(this.inner().location());
         params.withTags(this.inner().tags());
         return client.createOrUpdateAsync(this.name(), params)
+                .toObservable()
                 .map(innerToFluentMap(this));
     }
 
@@ -152,7 +150,7 @@ class ResourceGroupImpl extends
     }
 
     @Override
-    protected Observable<ResourceGroupInner> getInnerAsync() {
+    protected Maybe<ResourceGroupInner> getInnerAsync() {
         return client.getAsync(this.key);
     }
 }

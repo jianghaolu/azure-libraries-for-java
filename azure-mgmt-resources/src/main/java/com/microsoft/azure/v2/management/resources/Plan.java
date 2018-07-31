@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Plan for the resource.
  */
-public class Plan {
+public final class Plan {
     /**
      * The plan ID.
      */
@@ -127,7 +127,7 @@ public class Plan {
     /**
      * Get the version value.
      *
-     * @return the version value
+     * @return the version value.
      */
     public String version() {
         return this.version;
@@ -136,12 +136,11 @@ public class Plan {
     /**
      * Set the version value.
      *
-     * @param version the version value to set
+     * @param version the version value to set.
      * @return the Plan object itself.
      */
     public Plan withVersion(String version) {
         this.version = version;
         return this;
     }
-
 }

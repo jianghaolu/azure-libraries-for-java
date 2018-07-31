@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * HTTP message.
  */
-public class HttpMessage {
+public final class HttpMessage {
     /**
      * HTTP message content.
      */

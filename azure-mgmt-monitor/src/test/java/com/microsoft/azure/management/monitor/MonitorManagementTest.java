@@ -10,7 +10,7 @@ import com.microsoft.azure.management.compute.implementation.ComputeManager;
 import com.microsoft.azure.management.eventhub.implementation.EventHubManager;
 import com.microsoft.azure.management.monitor.implementation.MonitorManager;
 import com.microsoft.azure.management.resources.core.TestBase;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
 import com.microsoft.azure.management.storage.implementation.StorageManager;
 import com.microsoft.rest.RestClient;
 

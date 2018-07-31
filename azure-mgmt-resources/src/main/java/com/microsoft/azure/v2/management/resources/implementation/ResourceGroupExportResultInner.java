@@ -14,7 +14,7 @@ import com.microsoft.azure.v2.management.resources.ResourceManagementErrorWithDe
 /**
  * Resource group export result.
  */
-public class ResourceGroupExportResultInner {
+public final class ResourceGroupExportResultInner {
     /**
      * The template content.
      */

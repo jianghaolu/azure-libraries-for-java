@@ -4,16 +4,16 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources.implementation;
+package com.microsoft.azure.v2.management.resources.implementation;
 
-import com.microsoft.azure.PagedList;
-import com.microsoft.azure.management.resources.Subscription;
-import com.microsoft.azure.management.resources.Subscriptions;
+import com.microsoft.azure.v2.PagedList;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.ReadableWrappersImpl;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.SupportsGettingByIdImpl;
 import com.microsoft.azure.management.resources.fluentcore.utils.PagedListConverter;
-import rx.Observable;
-import rx.functions.Func1;
+import com.microsoft.azure.v2.management.resources.Subscription;
+import com.microsoft.azure.v2.management.resources.Subscriptions;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 
 /**
  * The implementation of Subscriptions.
@@ -40,26 +40,17 @@ final class SubscriptionsImpl
 
 
     @Override
-    public Observable<Subscription> getByIdAsync(String id) {
-        return client.getAsync(id).map(new Func1<SubscriptionInner, Subscription>() {
-            @Override
-            public Subscription call(SubscriptionInner subscriptionInner) {
-                return wrapModel(subscriptionInner);
-            }
-        });
+    public Maybe<Subscription> getByIdAsync(String id) {
+        return client.getAsync(id).map(this::wrapModel);
     }
 
     @Override
     public Observable<Subscription> listAsync() {
-        return ReadableWrappersImpl.convertPageToInnerAsync(client.listAsync()).map(new Func1<SubscriptionInner, Subscription>() {
-            @Override
-            public Subscription call(SubscriptionInner subscriptionInner) {
-                return wrapModel(subscriptionInner);
-            }
-        });
+        return ReadableWrappersImpl.convertPageToInnerAsync(client.listAsync())
+                .map(this::wrapModel);
     }
 
-    private SubscriptionImpl wrapModel(SubscriptionInner subscriptionInner) {
+    private Subscription wrapModel(SubscriptionInner subscriptionInner) {
         if (subscriptionInner == null) {
             return null;
         }

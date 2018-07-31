@@ -52,7 +52,7 @@
       <version>1.7.5</version>
     </dependency>
     <dependency>
-      <groupId>com.microsoft.azure</groupId>
+      <groupId>com.microsoft.azure.v2</groupId>
       <artifactId>azure-client-runtime</artifactId>
     </dependency>
     <dependency>
@@ -65,7 +65,11 @@
       <artifactId>rxjava</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.microsoft.azure</groupId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.azure.v2</groupId>
       <artifactId>azure-client-authentication</artifactId>
       <scope>test</scope>
     </dependency>
@@ -110,8 +114,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <annotationProcessors>
             <annotationProcessor>
               com.microsoft.azure.management.apigeneration.LangDefinitionProcessor</annotationProcessor>

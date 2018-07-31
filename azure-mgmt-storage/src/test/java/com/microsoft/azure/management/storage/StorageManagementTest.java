@@ -7,7 +7,7 @@
 package com.microsoft.azure.management.storage;
 
 import com.microsoft.azure.management.resources.core.TestBase;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
 import com.microsoft.azure.management.storage.implementation.StorageManager;
 import com.microsoft.rest.RestClient;
 

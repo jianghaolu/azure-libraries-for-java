@@ -8,9 +8,8 @@
 
 package com.microsoft.azure.v2.management.resources.implementation;
 
-import com.microsoft.azure.management.resources.PolicyType;
-import com.microsoft.azure.management.resources.PolicyMode;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.microsoft.azure.v2.management.resources.PolicyMode;
 import com.microsoft.azure.v2.management.resources.PolicyType;
 import com.microsoft.rest.v2.serializer.JsonFlatten;
 
@@ -99,7 +98,7 @@ public class PolicyDefinitionInner {
     /**
      * Get the mode value.
      *
-     * @return the mode value
+     * @return the mode value.
      */
     public PolicyMode mode() {
         return this.mode;
@@ -108,7 +107,7 @@ public class PolicyDefinitionInner {
     /**
      * Set the mode value.
      *
-     * @param mode the mode value to set
+     * @param mode the mode value to set.
      * @return the PolicyDefinitionInner object itself.
      */
     public PolicyDefinitionInner withMode(PolicyMode mode) {
@@ -179,7 +178,7 @@ public class PolicyDefinitionInner {
     /**
      * Get the metadata value.
      *
-     * @return the metadata value
+     * @return the metadata value.
      */
     public Object metadata() {
         return this.metadata;
@@ -188,7 +187,7 @@ public class PolicyDefinitionInner {
     /**
      * Set the metadata value.
      *
-     * @param metadata the metadata value to set
+     * @param metadata the metadata value to set.
      * @return the PolicyDefinitionInner object itself.
      */
     public PolicyDefinitionInner withMetadata(Object metadata) {
@@ -199,7 +198,7 @@ public class PolicyDefinitionInner {
     /**
      * Get the parameters value.
      *
-     * @return the parameters value
+     * @return the parameters value.
      */
     public Object parameters() {
         return this.parameters;
@@ -208,7 +207,7 @@ public class PolicyDefinitionInner {
     /**
      * Set the parameters value.
      *
-     * @param parameters the parameters value to set
+     * @param parameters the parameters value to set.
      * @return the PolicyDefinitionInner object itself.
      */
     public PolicyDefinitionInner withParameters(Object parameters) {
@@ -219,7 +218,7 @@ public class PolicyDefinitionInner {
     /**
      * Get the id value.
      *
-     * @return the id value
+     * @return the id value.
      */
     public String id() {
         return this.id;
@@ -228,10 +227,9 @@ public class PolicyDefinitionInner {
     /**
      * Get the name value.
      *
-     * @return the name value
+     * @return the name value.
      */
     public String name() {
         return this.name;
     }
-
 }

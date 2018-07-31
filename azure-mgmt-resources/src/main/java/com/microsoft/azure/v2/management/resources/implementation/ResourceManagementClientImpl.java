@@ -13,11 +13,12 @@ import com.microsoft.azure.v2.AzureProxy;
 import com.microsoft.azure.v2.AzureServiceClient;
 import com.microsoft.rest.v2.credentials.ServiceClientCredentials;
 import com.microsoft.rest.v2.http.HttpPipeline;
+import io.reactivex.annotations.NonNull;
 
 /**
  * Initializes a new instance of the ResourceManagementClientImpl type.
  */
-public class ResourceManagementClientImpl extends AzureServiceClient {
+public final class ResourceManagementClientImpl extends AzureServiceClient {
     /**
      * The ID of the target subscription.
      */
@@ -58,12 +59,12 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
     }
 
     /**
-     * Gets or sets the preferred language for the response.
+     * The preferred language for the response.
      */
     private String acceptLanguage;
 
     /**
-     * Gets Gets or sets the preferred language for the response.
+     * Gets The preferred language for the response.
      *
      * @return the acceptLanguage value.
      */
@@ -72,7 +73,7 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
     }
 
     /**
-     * Sets Gets or sets the preferred language for the response.
+     * Sets The preferred language for the response.
      *
      * @param acceptLanguage the acceptLanguage value.
      * @return the service client itself.
@@ -83,12 +84,12 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
     }
 
     /**
-     * Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * The retry timeout in seconds for Long Running Operations. Default value is 30.
      */
     private int longRunningOperationRetryTimeout;
 
     /**
-     * Gets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * Gets The retry timeout in seconds for Long Running Operations. Default value is 30.
      *
      * @return the longRunningOperationRetryTimeout value.
      */
@@ -97,7 +98,7 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
     }
 
     /**
-     * Sets Gets or sets the retry timeout in seconds for Long Running Operations. Default value is 30.
+     * Sets The retry timeout in seconds for Long Running Operations. Default value is 30.
      *
      * @param longRunningOperationRetryTimeout the longRunningOperationRetryTimeout value.
      * @return the service client itself.
@@ -108,12 +109,12 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
     }
 
     /**
-     * When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
+     * Whether a unique x-ms-client-request-id should be generated. When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
      */
     private boolean generateClientRequestId;
 
     /**
-     * Gets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
+     * Gets Whether a unique x-ms-client-request-id should be generated. When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
      *
      * @return the generateClientRequestId value.
      */
@@ -122,7 +123,7 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
     }
 
     /**
-     * Sets When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
+     * Sets Whether a unique x-ms-client-request-id should be generated. When set to true a unique x-ms-client-request-id value is generated and included in each request. Default is true.
      *
      * @param generateClientRequestId the generateClientRequestId value.
      * @return the service client itself.
@@ -167,6 +168,7 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
 
     /**
      * Gets the ResourcesInner object to access its operations.
+     *
      * @return the ResourcesInner object.
      */
     public ResourcesInner resources() {
@@ -180,6 +182,7 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
 
     /**
      * Gets the ResourceGroupsInner object to access its operations.
+     *
      * @return the ResourceGroupsInner object.
      */
     public ResourceGroupsInner resourceGroups() {
@@ -219,7 +222,7 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
      *
      * @param credentials the management credentials for Azure.
      */
-    public ResourceManagementClientImpl(ServiceClientCredentials credentials) {
+    public ResourceManagementClientImpl(@NonNull ServiceClientCredentials credentials) {
         this(AzureProxy.createDefaultPipeline(ResourceManagementClientImpl.class, credentials));
     }
 
@@ -229,7 +232,7 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
      * @param credentials the management credentials for Azure.
      * @param azureEnvironment The environment that requests will target.
      */
-    public ResourceManagementClientImpl(ServiceClientCredentials credentials, AzureEnvironment azureEnvironment) {
+    public ResourceManagementClientImpl(@NonNull ServiceClientCredentials credentials, @NonNull AzureEnvironment azureEnvironment) {
         this(AzureProxy.createDefaultPipeline(ResourceManagementClientImpl.class, credentials), azureEnvironment);
     }
 
@@ -238,31 +241,27 @@ public class ResourceManagementClientImpl extends AzureServiceClient {
      *
      * @param httpPipeline The HTTP pipeline to send requests through.
      */
-    public ResourceManagementClientImpl(HttpPipeline httpPipeline) {
+    public ResourceManagementClientImpl(@NonNull HttpPipeline httpPipeline) {
         this(httpPipeline, null);
     }
 
-    protected void initialize() {
+    /**
+     * Initializes an instance of ResourceManagementClient client.
+     *
+     * @param httpPipeline The HTTP pipeline to send requests through.
+     * @param azureEnvironment The environment that requests will target.
+     */
+    public ResourceManagementClientImpl(@NonNull HttpPipeline httpPipeline, @NonNull AzureEnvironment azureEnvironment) {
+        super(httpPipeline, azureEnvironment);
         this.apiVersion = "2017-05-10";
         this.acceptLanguage = "en-US";
         this.longRunningOperationRetryTimeout = 30;
         this.generateClientRequestId = true;
-        this.deployments = new DeploymentsInner(restClient().retrofit(), this);
-        this.providers = new ProvidersInner(restClient().retrofit(), this);
-        this.resources = new ResourcesInner(restClient().retrofit(), this);
-        this.resourceGroups = new ResourceGroupsInner(restClient().retrofit(), this);
-        this.tags = new TagsInner(restClient().retrofit(), this);
-        this.deploymentOperations = new DeploymentOperationsInner(restClient().retrofit(), this);
-        this.azureClient = new AzureClient(this);
-    }
-
-    /**
-     * Gets the User-Agent header for the client.
-     *
-     * @return the user agent string.
-     */
-    @Override
-    public String userAgent() {
-        return String.format("%s (%s, %s)", super.userAgent(), "ResourceManagementClient", "2017-05-10");
+        this.deployments = new DeploymentsInner(this);
+        this.providers = new ProvidersInner(this);
+        this.resources = new ResourcesInner(this);
+        this.resourceGroups = new ResourceGroupsInner(this);
+        this.tags = new TagsInner(this);
+        this.deploymentOperations = new DeploymentOperationsInner(this);
     }
 }

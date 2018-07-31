@@ -4,7 +4,7 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources;
+package com.microsoft.azure.v2.management.resources;
 
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.LangMethodDefinition;
@@ -21,15 +21,16 @@ import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
 import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
-import com.microsoft.azure.management.resources.implementation.DeploymentExtendedInner;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
-import org.joda.time.DateTime;
-import rx.Completable;
-import rx.Observable;
+import com.microsoft.azure.v2.management.resources.implementation.DeploymentExtendedInner;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
+import com.microsoft.rest.v2.ServiceCallback;
+import com.microsoft.rest.v2.ServiceFuture;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -63,7 +64,7 @@ public interface Deployment extends
     /**
      * @return the timestamp of the template deployment
      */
-    DateTime timestamp();
+    OffsetDateTime timestamp();
 
     /**
      * @return key/value pairs that represent deployment output
@@ -148,7 +149,7 @@ public interface Deployment extends
      * @return a representation of the deferred computation of this call returning the export result
      */
     @Method
-    Observable<DeploymentExportResult> exportTemplateAsync();
+    Maybe<DeploymentExportResult> exportTemplateAsync();
 
     /**
      * Exports a deployment template asynchronously.

@@ -4,16 +4,17 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources.implementation;
+package com.microsoft.azure.v2.management.resources.implementation;
 
-import com.microsoft.azure.PagedList;
-import com.microsoft.azure.management.resources.Deployment;
-import com.microsoft.azure.management.resources.DeploymentOperation;
-import com.microsoft.azure.management.resources.DeploymentOperations;
+import com.microsoft.azure.v2.PagedList;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.ReadableWrappersImpl;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
-import rx.Observable;
+import com.microsoft.azure.v2.management.resources.Deployment;
+import com.microsoft.azure.v2.management.resources.DeploymentOperation;
+import com.microsoft.azure.v2.management.resources.DeploymentOperations;
+import com.microsoft.rest.v2.ServiceCallback;
+import com.microsoft.rest.v2.ServiceFuture;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import rx.functions.Func1;
 
 /**
@@ -38,17 +39,13 @@ final class DeploymentOperationsImpl
 
     @Override
     public DeploymentOperation getById(String operationId) {
-        return getByIdAsync(operationId).toBlocking().last();
+        return getByIdAsync(operationId).blockingGet();
     }
 
     @Override
-    public Observable<DeploymentOperation> getByIdAsync(String operationId) {
-        return client.getAsync(deployment.resourceGroupName(), deployment.name(), operationId).map(new Func1<DeploymentOperationInner, DeploymentOperation>() {
-            @Override
-            public DeploymentOperation call(DeploymentOperationInner deploymentOperationInner) {
-                return wrapModel(deploymentOperationInner);
-            }
-        });
+    public Maybe<DeploymentOperation> getByIdAsync(String operationId) {
+        return client.getAsync(deployment.resourceGroupName(), deployment.name(), operationId)
+                .map(this::wrapModel);
     }
 
     @Override

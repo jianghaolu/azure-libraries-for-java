@@ -12,9 +12,8 @@ import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskItem;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
-import rx.Completable;
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,12 +131,9 @@ class SchoolsImpl {
         @Override
         public Observable<Indexable> invokeAsync(TaskGroup.InvocationContext context) {
             return Observable.<Indexable>just(this)
-                    .map(new Func1<Indexable, Indexable>() {
-                        @Override
-                        public Indexable call(Indexable indexable) {
-                            isInvoked = true;
-                            return indexable;
-                        }
+                    .map(indexable -> {
+                        isInvoked = true;
+                        return indexable;
                     });
         }
 
@@ -186,12 +182,9 @@ class SchoolsImpl {
         @Override
         public Observable<TeacherImpl> createResourceAsync() {
             return Observable.just(this)
-                    .map(new Func1<TeacherImpl, TeacherImpl>() {
-                        @Override
-                        public TeacherImpl call(TeacherImpl teacher) {
-                            isInvoked = true;
-                            return teacher;
-                        }
+                    .map(teacher -> {
+                        isInvoked = true;
+                        return teacher;
                     });
         }
 
@@ -201,7 +194,7 @@ class SchoolsImpl {
         }
 
         @Override
-        public Observable<Void> deleteResourceAsync() {
+        public Completable deleteResourceAsync() {
             throw new UnsupportedOperationException();
         }
 
@@ -313,12 +306,9 @@ class SchoolsImpl {
                 throw new IllegalStateException("teacherImpl.isInvoked() should be true");
             }
 
-            return Observable.just(this).map(new Func1<StudentImpl, StudentImpl>() {
-                @Override
-                public StudentImpl call(StudentImpl student) {
-                    isInvoked = true;
-                    return student;
-                }
+            return Observable.just(this).map(student -> {
+                isInvoked = true;
+                return student;
             });
         }
 
@@ -328,7 +318,7 @@ class SchoolsImpl {
         }
 
         @Override
-        public Observable<Void> deleteResourceAsync() {
+        public Completable deleteResourceAsync() {
             throw new UnsupportedOperationException();
         }
 

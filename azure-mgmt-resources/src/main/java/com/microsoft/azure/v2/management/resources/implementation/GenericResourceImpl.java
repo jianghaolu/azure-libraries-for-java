@@ -4,16 +4,15 @@
  * license information.
  */
 
-package com.microsoft.azure.management.resources.implementation;
+package com.microsoft.azure.v2.management.resources.implementation;
 
-import com.microsoft.azure.management.resources.GenericResource;
-import com.microsoft.azure.management.resources.Plan;
-import com.microsoft.azure.management.resources.Provider;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.GroupableResourceImpl;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
-import rx.Observable;
-import rx.functions.Func1;
+import com.microsoft.azure.v2.management.resources.GenericResource;
+import com.microsoft.azure.v2.management.resources.Plan;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 
 /**
  * The implementation for GenericResource and its nested interfaces.
@@ -77,7 +76,7 @@ final class GenericResourceImpl
     }
 
     @Override
-    protected Observable<GenericResourceInner> getInnerAsync() {
+    protected Maybe<GenericResourceInner> getInnerAsync() {
         return this.manager().inner().resources().getAsync(
                 resourceGroupName(),
                 resourceProviderNamespace(),
@@ -140,9 +139,8 @@ final class GenericResourceImpl
         if (apiVersion == null) {
             final ResourceManagementClientImpl serviceClient = this.manager().inner();
             observable = this.manager().providers().getByNameAsync(resourceProviderNamespace)
-                    .map(new Func1<Provider, String>() {
-                        @Override
-                        public String call(Provider provider) {
+                    .toObservable()
+                    .map(provider -> {
                             String id;
                             if (!isInCreateMode()) {
                                 id = inner().id();
@@ -157,14 +155,11 @@ final class GenericResourceImpl
                             }
                             self.apiVersion = ResourceUtils.defaultApiVersion(id, provider);
                             return self.apiVersion;
-                        }
-                    });
+                        });
         }
         final ResourcesInner resourceClient = this.manager().inner().resources();
         return observable
-                .flatMap(new Func1<String, Observable<GenericResource>>() {
-                    @Override
-                    public Observable<GenericResource> call(String api) {
+                .flatMap(api -> {
                         String name = name();
                         if (!isInCreateMode()) {
                             name = ResourceUtils.nameFromResourceId(inner().id());
@@ -177,9 +172,9 @@ final class GenericResourceImpl
                                 name,
                                 api,
                                 inner())
+                                .toObservable()
                                 .subscribeOn(SdkContext.getRxScheduler())
                                 .map(innerToFluentMap(self));
-                    }
-                });
+                    });
     }
 }

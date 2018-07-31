@@ -10,7 +10,7 @@ import com.microsoft.azure.management.cosmosdb.implementation.CosmosDBManager;
 import com.microsoft.azure.management.resources.core.TestBase;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
-import com.microsoft.azure.management.resources.implementation.ResourceManager;
+import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
 import com.microsoft.rest.RestClient;
 import org.junit.Assert;
 import org.junit.Test;
