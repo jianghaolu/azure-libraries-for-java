@@ -6,12 +6,12 @@
 
 package com.microsoft.azure.v2.management.graphrbac.implementation;
 
-import com.google.common.io.BaseEncoding;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.v2.AzureEnvironment;
 import com.microsoft.azure.v2.management.graphrbac.CertificateCredential;
 import com.microsoft.azure.v2.management.graphrbac.CertificateType;
 import com.microsoft.azure.v2.management.resources.fluentcore.model.implementation.IndexableRefreshableWrapperImpl;
+import com.microsoft.rest.v2.util.Base64Util;
 import io.reactivex.Maybe;
 
 import java.io.IOException;
@@ -37,8 +37,8 @@ class CertificateCredentialImpl<T>
 
     CertificateCredentialImpl(KeyCredentialInner keyCredential) {
         super(keyCredential);
-        if (keyCredential.customKeyIdentifier() != null && keyCredential.customKeyIdentifier().length != 0) {
-            this.name = new String(BaseEncoding.base64().decode(keyCredential.customKeyIdentifier().toString()));
+        if (keyCredential.customKeyIdentifier() != null && keyCredential.customKeyIdentifier().length > 0) {
+            this.name = new String(keyCredential.customKeyIdentifier());
         } else {
             this.name = keyCredential.keyId();
         }
@@ -47,8 +47,7 @@ class CertificateCredentialImpl<T>
     CertificateCredentialImpl(String name, HasCredential<?> parent) {
         super(new KeyCredentialInner()
                 .withUsage("Verify")
-                // TODO: service no longer takes string but byte[], check encoding is necessary
-                .withCustomKeyIdentifier(BaseEncoding.base64().encode(name.getBytes()).getBytes())
+                .withCustomKeyIdentifier(Base64Util.encode(name.getBytes()))
                 .withStartDate(OffsetDateTime.now())
                 .withEndDate(OffsetDateTime.now().plusYears(1)));
         this.name = name;
@@ -127,13 +126,13 @@ class CertificateCredentialImpl<T>
 
     @Override
     public CertificateCredentialImpl<T> withPublicKey(byte[] certificate) {
-        inner().withValue(BaseEncoding.base64().encode(certificate));
+        inner().withValue(Base64Util.encodeToString(certificate));
         return this;
     }
 
     @Override
     public CertificateCredentialImpl<T> withSecretKey(byte[] secret) {
-        inner().withValue(BaseEncoding.base64().encode(secret));
+        inner().withValue(Base64Util.encodeToString(secret));
         return this;
     }
 

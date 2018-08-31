@@ -6,7 +6,6 @@
 
 package com.microsoft.azure.v2.management.graphrbac.implementation;
 
-import com.google.common.collect.Lists;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.v2.CloudException;
 import com.microsoft.azure.v2.management.graphrbac.ActiveDirectoryApplication;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Implementation for ServicePrincipal and its parent interfaces.
@@ -151,7 +151,7 @@ class ServicePrincipalImpl
                 newCerts.put(create.name(), create);
             }
             Completable updateKeyCredentialsCompletable = manager().inner().servicePrincipals().updateKeyCredentialsAsync(sp.id(),
-                    Lists.transform(new ArrayList<>(newCerts.values()), input -> input.inner()));
+                    newCerts.values().stream().map(c -> c.inner()).collect(Collectors.toList()));
             completable = completable.mergeWith(updateKeyCredentialsCompletable);
         }
         //
@@ -164,7 +164,7 @@ class ServicePrincipalImpl
                 newPasses.put(create.name(), create);
             }
             Completable updatePasswordCredentialsCompletable = manager().inner().servicePrincipals().updatePasswordCredentialsAsync(sp.id(),
-                    Lists.transform(new ArrayList<>(newPasses.values()), input -> input.inner()));
+                    newPasses.values().stream().map(p -> p.inner()).collect(Collectors.toList()));
             completable = completable.mergeWith(updatePasswordCredentialsCompletable);
         }
         //

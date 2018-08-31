@@ -6,11 +6,11 @@
 
 package com.microsoft.azure.v2.management.graphrbac.implementation;
 
-import com.google.common.io.BaseEncoding;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.v2.AzureEnvironment;
 import com.microsoft.azure.v2.management.graphrbac.PasswordCredential;
 import com.microsoft.azure.v2.management.resources.fluentcore.model.implementation.IndexableRefreshableWrapperImpl;
+import com.microsoft.rest.v2.util.Base64Util;
 import io.reactivex.Maybe;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ class PasswordCredentialImpl<T>
     PasswordCredentialImpl(PasswordCredentialInner passwordCredential) {
         super(passwordCredential);
         if (passwordCredential.customKeyIdentifier() != null && !passwordCredential.customKeyIdentifier().isEmpty()) {
-            this.name = new String(BaseEncoding.base64().decode(passwordCredential.customKeyIdentifier()));
+            this.name = new String(Base64Util.decodeString(passwordCredential.customKeyIdentifier()));
         } else {
             this.name = passwordCredential.keyId();
         }
@@ -45,7 +45,7 @@ class PasswordCredentialImpl<T>
 
     PasswordCredentialImpl(String name, HasCredential<?> parent) {
         super(new PasswordCredentialInner()
-                .withCustomKeyIdentifier(BaseEncoding.base64().encode(name.getBytes()))
+                .withCustomKeyIdentifier(Base64Util.encodeToString(name.getBytes()))
                 .withStartDate(OffsetDateTime.now())
                 .withEndDate(OffsetDateTime.now().plusYears(1)));
         this.name = name;

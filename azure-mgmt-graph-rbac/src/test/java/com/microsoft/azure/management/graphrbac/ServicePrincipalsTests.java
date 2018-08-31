@@ -6,17 +6,15 @@
 
 package com.microsoft.azure.management.graphrbac;
 
-import com.google.common.base.Joiner;
-import com.google.common.io.ByteStreams;
 import com.microsoft.azure.v2.credentials.ApplicationTokenCredentials;
+import com.microsoft.azure.v2.management.graphrbac.BuiltInRole;
+import com.microsoft.azure.v2.management.graphrbac.RoleAssignment;
+import com.microsoft.azure.v2.management.graphrbac.ServicePrincipal;
 import com.microsoft.azure.v2.management.resources.ResourceGroup;
 import com.microsoft.azure.v2.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.v2.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.v2.management.resources.implementation.ResourceManager;
-import com.microsoft.azure.v2.management.graphrbac.BuiltInRole;
-import com.microsoft.azure.v2.management.graphrbac.RoleAssignment;
-import com.microsoft.azure.v2.management.graphrbac.ServicePrincipal;
-import org.joda.time.Duration;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,7 +40,7 @@ public class ServicePrincipalsTests extends GraphRbacManagementTest {
                         .withPasswordValue("StrongPass!12")
                         .attach()
                     .create();
-            System.out.println(servicePrincipal.id() + " - " + Joiner.on(", ").join(servicePrincipal.servicePrincipalNames()));
+            System.out.println(servicePrincipal.id() + " - " + String.join(", ", servicePrincipal.servicePrincipalNames()));
             Assert.assertNotNull(servicePrincipal.id());
             Assert.assertNotNull(servicePrincipal.applicationId());
             Assert.assertEquals(2, servicePrincipal.servicePrincipalNames().size());
@@ -62,7 +60,7 @@ public class ServicePrincipalsTests extends GraphRbacManagementTest {
                     .withoutCredential("sppass")
                     .defineCertificateCredential("spcert")
                         .withAsymmetricX509Certificate()
-                        .withPublicKey(ByteStreams.toByteArray(ServicePrincipalsTests.class.getResourceAsStream("/myTest.cer")))
+                        .withPublicKey(IOUtils.toByteArray(ServicePrincipalsTests.class.getResourceAsStream("/myTest.cer")))
                         .withDuration(java.time.Duration.ofDays(1))
                         .attach()
                     .apply();
@@ -104,7 +102,7 @@ public class ServicePrincipalsTests extends GraphRbacManagementTest {
                         .attach()
                     .withNewRoleInSubscription(BuiltInRole.CONTRIBUTOR, subscription)
                     .create();
-            System.out.println(servicePrincipal.id() + " - " + Joiner.on(", ").join(servicePrincipal.servicePrincipalNames()));
+            System.out.println(servicePrincipal.id() + " - " + String.join(", ", servicePrincipal.servicePrincipalNames()));
             Assert.assertNotNull(servicePrincipal.id());
             Assert.assertNotNull(servicePrincipal.applicationId());
             Assert.assertEquals(2, servicePrincipal.servicePrincipalNames().size());

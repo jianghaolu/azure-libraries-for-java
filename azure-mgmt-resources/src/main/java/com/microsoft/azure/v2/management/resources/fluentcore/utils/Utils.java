@@ -6,7 +6,6 @@
 
 package com.microsoft.azure.v2.management.resources.fluentcore.utils;
 
-import com.google.common.primitives.Ints;
 import com.microsoft.azure.v2.Page;
 import com.microsoft.azure.v2.PagedList;
 import com.microsoft.azure.v2.management.resources.fluentcore.model.Indexable;
@@ -66,7 +65,11 @@ public final class Utils {
         }
         // throws IllegalArgumentException - if value is greater than Integer.MAX_VALUE
         // or less than Integer.MIN_VALUE
-        return Ints.checkedCast(value);
+        if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) {
+            return (int) (long) value;
+        } else {
+            throw new IllegalArgumentException("Cannot convert long value " + value + " to an integer");
+        }
     }
 
     /**

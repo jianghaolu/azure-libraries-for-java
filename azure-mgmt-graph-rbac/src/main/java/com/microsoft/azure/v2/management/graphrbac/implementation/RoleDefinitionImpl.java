@@ -6,12 +6,12 @@
 
 package com.microsoft.azure.v2.management.graphrbac.implementation;
 
-import com.google.common.collect.Sets;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.v2.management.graphrbac.RoleDefinition;
 import com.microsoft.azure.v2.management.resources.fluentcore.model.implementation.WrapperImpl;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -71,7 +71,7 @@ class RoleDefinitionImpl
         if (inner().permissionsProperty() == null) {
             return null;
         }
-        return Collections.unmodifiableSet(Sets.newHashSet(inner().permissionsProperty()));
+        return Collections.unmodifiableSet(new HashSet<>(inner().permissionsProperty()));
     }
 
     @Override
@@ -79,6 +79,6 @@ class RoleDefinitionImpl
         if (inner().assignableScopes() == null) {
             return null;
         }
-        return Collections.unmodifiableSet(Sets.newHashSet(inner().assignableScopes()));
+        return Collections.unmodifiableSet(new HashSet<>(inner().assignableScopes()));
     }
 }

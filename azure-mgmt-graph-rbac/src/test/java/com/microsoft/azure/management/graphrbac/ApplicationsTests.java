@@ -6,9 +6,9 @@
 
 package com.microsoft.azure.management.graphrbac;
 
-import com.google.common.io.ByteStreams;
-import com.microsoft.azure.v2.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.v2.management.graphrbac.ActiveDirectoryApplication;
+import com.microsoft.azure.v2.management.resources.fluentcore.utils.SdkContext;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class ApplicationsTests extends GraphRbacManagementTest {
                         .attach()
                     .defineCertificateCredential("cert")
                         .withAsymmetricX509Certificate()
-                        .withPublicKey(ByteStreams.toByteArray(this.getClass().getResourceAsStream("/myTest.cer")))
+                        .withPublicKey(IOUtils.toByteArray(this.getClass().getResourceAsStream("/myTest.cer")))
                         .withDuration(java.time.Duration.ofDays(100))
                         .attach()
                     .create();
