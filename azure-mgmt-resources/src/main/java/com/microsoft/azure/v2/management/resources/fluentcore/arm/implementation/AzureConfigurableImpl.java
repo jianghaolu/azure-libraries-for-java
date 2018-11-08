@@ -15,7 +15,11 @@ import com.microsoft.rest.v2.http.HttpClientConfiguration;
 import com.microsoft.rest.v2.http.HttpPipeline;
 import com.microsoft.rest.v2.http.HttpPipelineBuilder;
 import com.microsoft.azure.v2.policy.AsyncCredentialsPolicyFactory;
+import com.microsoft.rest.v2.policy.CookiePolicyFactory;
+import com.microsoft.rest.v2.policy.DecodingPolicyFactory;
 import com.microsoft.rest.v2.policy.RequestPolicyFactory;
+import com.microsoft.rest.v2.policy.RetryPolicyFactory;
+import com.microsoft.rest.v2.policy.UserAgentPolicyFactory;
 
 import java.net.Proxy;
 
@@ -50,6 +54,10 @@ public class AzureConfigurableImpl<T extends AzureConfigurable<T>>
 
     protected HttpPipeline buildPipeline(AzureTokenCredentials credentials) {
         HttpPipeline pipeline = pipelineBuilder
+                .withRequestPolicy(new UserAgentPolicyFactory())
+                .withRequestPolicy(new RetryPolicyFactory())
+                .withRequestPolicy(new DecodingPolicyFactory())
+                .withRequestPolicy(new CookiePolicyFactory())
                 .withRequestPolicy(new AsyncCredentialsPolicyFactory(credentials))
                 .withRequestPolicy(new ProviderRegistrationPolicyFactory(credentials))
                 .withRequestPolicy(new ResourceManagerThrottlingPolicyFactory())

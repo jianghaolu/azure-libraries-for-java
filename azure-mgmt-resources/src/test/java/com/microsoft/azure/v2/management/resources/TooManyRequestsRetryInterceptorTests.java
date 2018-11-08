@@ -41,12 +41,12 @@ public class TooManyRequestsRetryInterceptorTests extends ResourceManagerTestBas
 
     @Test
     public void canGenerate429() throws Exception {
-        Observable.range(1, 1250).flatMap(new Function<Integer, Observable<ResourceGroup>>() {
+        Observable.range(1, 5000).flatMap(new Function<Integer, Observable<ResourceGroup>>() {
             @Override
             public Observable<ResourceGroup> apply(final Integer iteration) {
                 return rg.update().applyAsync();
             }
-        }, 10)
-            .subscribeOn(Schedulers.io()).blockingSubscribe();
+        }).blockingSubscribe();
+        System.out.println("succeed");
     }
 }

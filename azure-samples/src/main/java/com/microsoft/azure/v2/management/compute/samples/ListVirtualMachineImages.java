@@ -98,7 +98,7 @@ public final class ListVirtualMachineImages {
             final File credFile = new File(System.getenv("AZURE_AUTH_LOCATION"));
 
             Azure azure = Azure.configure()
-                    .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.BODY_AND_HEADERS))
+                    .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.NONE))
                     .authenticate(credFile)
                     .withDefaultSubscription();
 

@@ -165,7 +165,7 @@ public abstract class TestBase {
                             .withRequestPolicy(new RetryPolicyFactory())
                             .withRequestPolicy(new AsyncCredentialsPolicyFactory(credentials))
                             .withRequestPolicy(new ResourceManagerThrottlingPolicyFactory())
-                            .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.BODY_AND_HEADERS, true))
+                            .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.NONE, true))
                             .withHttpClient(interceptorManager.initPlaybackClient())
                             .withDecodingPolicy()
                     ,true);
@@ -187,9 +187,8 @@ public abstract class TestBase {
                     .withRequestPolicy(new ProviderRegistrationPolicyFactory(credentials))
                     .withRequestPolicy(new AsyncCredentialsPolicyFactory(credentials))
                     .withRequestPolicy(new TimeoutPolicyFactory(3, TimeUnit.MINUTES))
-                    .withRequestPolicy(interceptorManager.initRecordPolicy())
                     .withRequestPolicy(new ResourceManagerThrottlingPolicyFactory())
-                    .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.BODY_AND_HEADERS, true))
+                    .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.BASIC, true))
                     .withDecodingPolicy()
                     ,false);
 

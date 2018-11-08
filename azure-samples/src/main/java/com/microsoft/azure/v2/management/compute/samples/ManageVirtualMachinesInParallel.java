@@ -128,12 +128,14 @@ public final class ManageVirtualMachinesInParallel {
             final File credFile = new File(System.getenv("AZURE_AUTH_LOCATION"));
 
             Azure azure = Azure.configure()
-                    .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.BODY_AND_HEADERS))
+                    .withRequestPolicy(new HttpLoggingPolicyFactory(HttpLogDetailLevel.NONE))
                     .authenticate(credFile)
                     .withDefaultSubscription();
 
             // Print selected subscription
             System.out.println("Selected subscription: " + azure.subscriptionId());
+
+            azure.virtualMachines().manager().inner().withLongRunningOperationRetryTimeout(5);
 
             runSample(azure);
         } catch (Exception e) {

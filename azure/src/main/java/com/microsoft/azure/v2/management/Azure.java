@@ -75,6 +75,10 @@ import com.microsoft.azure.v2.policy.AsyncCredentialsPolicyFactory;
 import com.microsoft.rest.v2.annotations.Beta;
 import com.microsoft.rest.v2.http.HttpPipeline;
 import com.microsoft.rest.v2.http.HttpPipelineBuilder;
+import com.microsoft.rest.v2.policy.CookiePolicyFactory;
+import com.microsoft.rest.v2.policy.DecodingPolicyFactory;
+import com.microsoft.rest.v2.policy.RetryPolicyFactory;
+import com.microsoft.rest.v2.policy.UserAgentPolicyFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -161,6 +165,10 @@ public final class Azure {
      */
     public static Authenticated authenticate(AzureTokenCredentials credentials) {
         return new AuthenticatedImpl(new HttpPipelineBuilder()
+                .withRequestPolicy(new UserAgentPolicyFactory())
+                .withRequestPolicy(new RetryPolicyFactory())
+                .withRequestPolicy(new DecodingPolicyFactory())
+                .withRequestPolicy(new CookiePolicyFactory())
                 .withRequestPolicy(new AsyncCredentialsPolicyFactory(credentials))
                 .withRequestPolicy(new ProviderRegistrationPolicyFactory(credentials))
                 .withRequestPolicy(new ResourceManagerThrottlingPolicyFactory())
@@ -186,6 +194,10 @@ public final class Azure {
     public static Authenticated authenticate(File credentialsFile) throws IOException {
         ApplicationTokenCredentials credentials = ApplicationTokenCredentials.fromFile(credentialsFile);
         return new AuthenticatedImpl(new HttpPipelineBuilder()
+                .withRequestPolicy(new UserAgentPolicyFactory())
+                .withRequestPolicy(new RetryPolicyFactory())
+                .withRequestPolicy(new DecodingPolicyFactory())
+                .withRequestPolicy(new CookiePolicyFactory())
                 .withRequestPolicy(new AsyncCredentialsPolicyFactory(credentials))
                 .withRequestPolicy(new ProviderRegistrationPolicyFactory(credentials))
                 .withRequestPolicy(new ResourceManagerThrottlingPolicyFactory())

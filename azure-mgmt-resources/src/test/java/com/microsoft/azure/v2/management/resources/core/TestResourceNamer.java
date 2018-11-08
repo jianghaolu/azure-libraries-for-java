@@ -30,7 +30,7 @@ public class TestResourceNamer extends ResourceNamer {
         }
         String randomName = super.randomName(prefix, maxLen);
 
-        interceptorManager.pushVariable(randomName);
+//        interceptorManager.pushVariable(randomName);
 
         return randomName;
     }
@@ -42,7 +42,7 @@ public class TestResourceNamer extends ResourceNamer {
         }
         String randomName = super.randomUuid();
 
-        interceptorManager.pushVariable(randomName);
+//        interceptorManager.pushVariable(randomName);
 
         return randomName;
     }
